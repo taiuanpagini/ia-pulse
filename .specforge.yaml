@@ -1,0 +1,12 @@
+stack: web-fastapi
+projectName: IAPulse
+templateSource: AP-DIGITAL-SERVICES/spec-templates
+templateBranch: main
+specsDir: specs
+decisions:
+  caching: none
+  queue: none
+  streaming: none
+  backgroundJobs: none
+  search: none
+  fileStorage: none

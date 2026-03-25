@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "ado": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@azure-devops/mcp",
+        "YOUR_ADO_ORG",
+        "-d",
+        "core",
+        "work",
+        "work-items",
+        "test-plans",
+        "repositories"
+      ]
+    }
+  }
+}
