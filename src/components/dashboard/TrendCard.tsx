@@ -90,22 +90,30 @@ export function TrendCard(props: TrendCardProps) {
           {/* Header row: topic badge + score/pending */}
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 1 }}>
             <TopicBadge name={topicName} color={topicColor} />
-            {variant === "scored" ? (
-              <ScoreBadge total={props.score.total} />
-            ) : (
-              <Chip
-                label="Pendente"
-                size="small"
-                sx={{
-                  bgcolor: "#f8fafc",
-                  color: "#94a3b8",
-                  fontSize: "0.65rem",
-                  height: 20,
-                  border: "1px dashed #cbd5e1",
-                  "& .MuiChip-label": { px: 0.75 },
-                }}
-              />
-            )}
+            <Stack direction="row" spacing={0.5} alignItems="center" flexShrink={0}>
+              {variant === "scored" && props.status === "approved" && (
+                <Chip label="Aprovado" size="small" sx={{ bgcolor: "#ecfdf5", color: "#065f46", fontSize: "0.62rem", height: 18, "& .MuiChip-label": { px: 0.75 } }} />
+              )}
+              {variant === "scored" && props.status === "discarded" && (
+                <Chip label="Descartado" size="small" sx={{ bgcolor: "#fef2f2", color: "#991b1b", fontSize: "0.62rem", height: 18, "& .MuiChip-label": { px: 0.75 } }} />
+              )}
+              {variant === "scored" ? (
+                <ScoreBadge total={props.score.total} />
+              ) : (
+                <Chip
+                  label="Pendente"
+                  size="small"
+                  sx={{
+                    bgcolor: "#f8fafc",
+                    color: "#94a3b8",
+                    fontSize: "0.65rem",
+                    height: 20,
+                    border: "1px dashed #cbd5e1",
+                    "& .MuiChip-label": { px: 0.75 },
+                  }}
+                />
+              )}
+            </Stack>
           </Box>
 
           {/* Title */}

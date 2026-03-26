@@ -2,7 +2,15 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined";
 
-export function DashboardEmptyState() {
+interface DashboardEmptyStateProps {
+  message?: string;
+  sub?: string;
+}
+
+export function DashboardEmptyState({
+  message = "Nenhuma tendência coletada ainda.",
+  sub = "O sistema coleta automaticamente todos os dias às 07:00 UTC.",
+}: DashboardEmptyStateProps) {
   return (
     <Box
       sx={{
@@ -16,10 +24,10 @@ export function DashboardEmptyState() {
     >
       <InboxOutlinedIcon sx={{ fontSize: 56, opacity: 0.35 }} />
       <Typography variant="body1" textAlign="center" maxWidth={360} color="text.secondary">
-        Nenhuma tendência coletada ainda.
+        {message}
       </Typography>
       <Typography variant="body2" textAlign="center" maxWidth={360} color="text.disabled">
-        O sistema coleta automaticamente todos os dias às 07:00 UTC.
+        {sub}
       </Typography>
     </Box>
   );

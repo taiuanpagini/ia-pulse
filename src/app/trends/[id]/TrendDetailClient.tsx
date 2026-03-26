@@ -10,13 +10,19 @@ import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
 import Chip from "@mui/material/Chip";
+import Typography from "@mui/material/Typography";
+import Stack from "@mui/material/Stack";
+import Divider from "@mui/material/Divider";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import AssessmentOutlinedIcon from "@mui/icons-material/AssessmentOutlined";
 import TranslateIcon from "@mui/icons-material/Translate";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import { ScoreForm } from "@/components/scoring/ScoreForm";
 import { ScoreDisplay } from "@/components/trend/ScoreDisplay";
 import { TrendDetailHeader } from "@/components/trend/TrendDetailHeader";
-import type { TrendDetail } from "@/lib/trends/service";
+import type { TrendDetail, TrendStatus } from "@/lib/trends/service";
 import type { ScoreFormValues } from "@/lib/scoring/schemas";
 
 interface TrendDetailClientProps {
@@ -30,12 +36,13 @@ export function TrendDetailClient({ trend, defaultValues }: TrendDetailClientPro
   const [translating, setTranslating] = useState(false);
   const [translateError, setTranslateError] = useState<string | null>(null);
   const [translation, setTranslation] = useState<{ titlePt: string; summaryPt: string } | null>(
-    trend.score !== undefined && (trend as unknown as { titlePt?: string }).titlePt
-      ? { titlePt: (trend as unknown as { titlePt: string }).titlePt, summaryPt: (trend as unknown as { summaryPt: string }).summaryPt ?? "" }
-      : null
+    trend.titlePt ? { titlePt: trend.titlePt, summaryPt: trend.summaryPt ?? "" } : null
   );
+  const [currentStatus, setCurrentStatus] = useState<TrendStatus | undefined>(trend.status);
+  const [statusLoading, setStatusLoading] = useState(false);
+  const [statusError, setStatusError] = useState<string | null>(null);
 
-  const isAlreadyPt = (trend as unknown as { lang?: string }).lang === "pt";
+  const isAlreadyPt = trend.lang === "pt";
 
   async function handleTranslate() {
     setTranslating(true);
@@ -46,10 +53,7 @@ export function TrendDetailClient({ trend, defaultValues }: TrendDetailClientPro
         data?: { titlePt: string; summaryPt: string };
         error?: { message: string };
       };
-      if (!res.ok) {
-        setTranslateError(body.error?.message ?? "Erro ao traduzir");
-        return;
-      }
+      if (!res.ok) { setTranslateError(body.error?.message ?? "Erro ao traduzir"); return; }
       if (body.data) setTranslation(body.data);
     } catch {
       setTranslateError("Erro de conexão");
@@ -58,8 +62,35 @@ export function TrendDetailClient({ trend, defaultValues }: TrendDetailClientPro
     }
   }
 
+  async function handleStatusChange(newStatus: TrendStatus) {
+    if (newStatus === currentStatus) return;
+    setStatusLoading(true);
+    setStatusError(null);
+    try {
+      const res = await fetch(`/api/trends/${trend.id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      const body = (await res.json()) as { data?: { status: TrendStatus }; error?: { message: string } };
+      if (!res.ok) { setStatusError(body.error?.message ?? "Erro ao atualizar status"); return; }
+      setCurrentStatus(body.data?.status);
+      router.refresh();
+    } catch {
+      setStatusError("Erro de conexão");
+    } finally {
+      setStatusLoading(false);
+    }
+  }
+
   const displayTitle = translation?.titlePt ?? trend.title;
   const displaySummary = translation?.summaryPt ?? trend.summary;
+
+  const statusConfig = {
+    pending: { label: "Em análise", icon: <RadioButtonUncheckedIcon fontSize="small" />, color: "inherit" as const },
+    approved: { label: "Aprovado", icon: <CheckCircleIcon fontSize="small" />, color: "success" as const },
+    discarded: { label: "Descartado", icon: <CancelIcon fontSize="small" />, color: "error" as const },
+  };
 
   return (
     <Paper elevation={0} sx={{ border: "1px solid", borderColor: "divider", borderRadius: 2, overflow: "hidden" }}>
@@ -70,8 +101,8 @@ export function TrendDetailClient({ trend, defaultValues }: TrendDetailClientPro
         </Tabs>
       </Box>
 
+      {/* ── Detalhes ── */}
       <Box hidden={tab !== 0} sx={{ p: 3 }}>
-        {/* Botão de tradução */}
         {!isAlreadyPt && (
           <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2, gap: 1, alignItems: "center" }}>
             {translation && (
@@ -89,9 +120,7 @@ export function TrendDetailClient({ trend, defaultValues }: TrendDetailClientPro
           </Box>
         )}
         {translateError && (
-          <Alert severity="warning" sx={{ mb: 2, py: 0.5, fontSize: "0.75rem" }}>
-            {translateError}
-          </Alert>
+          <Alert severity="warning" sx={{ mb: 2, py: 0.5, fontSize: "0.75rem" }}>{translateError}</Alert>
         )}
 
         <TrendDetailHeader
@@ -110,8 +139,49 @@ export function TrendDetailClient({ trend, defaultValues }: TrendDetailClientPro
             <ScoreDisplay score={trend.score} />
           </Box>
         )}
+
+        {/* ── Status ── */}
+        {trend.score && (
+          <>
+            <Divider sx={{ my: 3 }} />
+            <Box>
+              <Typography variant="subtitle2" color="text.secondary" fontWeight={600} gutterBottom>
+                Status da tendência
+              </Typography>
+              <Typography variant="caption" color="text.disabled" display="block" mb={1.5}>
+                Classificar determina se este item aparece em Aprovados ou Descartados no dashboard.
+              </Typography>
+
+              {statusError && (
+                <Alert severity="error" sx={{ mb: 1.5, py: 0.5, fontSize: "0.75rem" }}>{statusError}</Alert>
+              )}
+
+              <Stack direction="row" spacing={1}>
+                {(["pending", "approved", "discarded"] as TrendStatus[]).map((s) => {
+                  const cfg = statusConfig[s];
+                  const isActive = (currentStatus ?? "pending") === s;
+                  return (
+                    <Button
+                      key={s}
+                      size="small"
+                      variant={isActive ? "contained" : "outlined"}
+                      color={cfg.color}
+                      startIcon={statusLoading && isActive ? <CircularProgress size={12} /> : cfg.icon}
+                      onClick={() => handleStatusChange(s)}
+                      disabled={statusLoading}
+                      sx={{ fontWeight: isActive ? 700 : 500, minWidth: 120 }}
+                    >
+                      {cfg.label}
+                    </Button>
+                  );
+                })}
+              </Stack>
+            </Box>
+          </>
+        )}
       </Box>
 
+      {/* ── Avaliação ── */}
       <Box hidden={tab !== 1} sx={{ p: 3 }}>
         <ScoreForm
           trendId={trend.id}

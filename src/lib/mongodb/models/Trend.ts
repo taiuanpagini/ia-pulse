@@ -20,6 +20,8 @@ export interface ITrend extends Document {
   topicSlug: string;
   collectedAt: Date;
   publishedAt?: Date;
+  status?: "pending" | "approved" | "discarded";
+  statusAt?: Date;
   deletedAt?: Date;
   score?: IScore;
   lang?: "pt" | "en";
@@ -53,6 +55,8 @@ const TrendSchema = new Schema<ITrend>(
     topicSlug: { type: String, required: true },
     collectedAt: { type: Date, required: true, default: Date.now },
     publishedAt: { type: Date },
+    status: { type: String, enum: ["pending", "approved", "discarded"] },
+    statusAt: { type: Date },
     deletedAt: { type: Date },
     score: { type: ScoreSchema },
     lang: { type: String, enum: ["pt", "en"] },
@@ -67,6 +71,7 @@ TrendSchema.index({ topicSlug: 1, collectedAt: -1 });
 TrendSchema.index({ "score.total": -1 });
 TrendSchema.index({ source: 1 });
 TrendSchema.index({ collectedAt: -1 });
+TrendSchema.index({ status: 1 });
 TrendSchema.index({ title: "text", summary: "text", titlePt: "text", summaryPt: "text" });
 
 export const Trend: Model<ITrend> =
