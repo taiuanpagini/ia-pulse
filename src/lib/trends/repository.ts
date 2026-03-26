@@ -1,4 +1,5 @@
 import { FilterQuery } from "mongoose";
+import mongoose from "mongoose";
 import { Trend, ITrend } from "@/lib/mongodb/models/Trend";
 import { TrendFilters } from "./schemas";
 
@@ -51,4 +52,27 @@ export async function findTrendsPaginated(
 
 export async function listDistinctSources(): Promise<string[]> {
   return Trend.distinct("source", { deletedAt: null });
+}
+
+export async function getScoredTrends(topicSlug?: string | null, limit = 50) {
+  const filter: FilterQuery<ITrend> = {
+    score: { $exists: true },
+    deletedAt: null,
+    ...(topicSlug ? { topicSlug } : {}),
+  };
+  return Trend.find(filter).sort({ "score.total": -1 }).limit(limit).lean();
+}
+
+export async function getUnscoredTrends(topicSlug?: string | null, limit = 50) {
+  const filter: FilterQuery<ITrend> = {
+    score: { $exists: false },
+    deletedAt: null,
+    ...(topicSlug ? { topicSlug } : {}),
+  };
+  return Trend.find(filter).sort({ collectedAt: -1 }).limit(limit).lean();
+}
+
+export async function getTrendById(id: string) {
+  if (!mongoose.isValidObjectId(id)) return null;
+  return Trend.findOne({ _id: id, deletedAt: null }).lean();
 }

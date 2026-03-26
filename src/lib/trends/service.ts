@@ -1,9 +1,17 @@
 import { connectDB } from "@/lib/mongodb/client";
 import { TrendFilters, TrendListItem, TrendListResponse } from "./schemas";
-import { buildTrendQuery, findTrendsPaginated, listDistinctSources } from "./repository";
-import { findAllTopics } from "@/lib/topics/repository";
+import {
+  buildTrendQuery,
+  findTrendsPaginated,
+  listDistinctSources,
+  getScoredTrends,
+  getUnscoredTrends,
+  getTrendById,
+} from "./repository";
+import { findAllTopics, findTopicBySlug } from "@/lib/topics/repository";
 import { ITopic } from "@/lib/mongodb/models/Topic";
 import { ITrend } from "@/lib/mongodb/models/Trend";
+import { getScoreLevel, ScoreLevel } from "@/lib/scoring/levels";
 
 function toTrendListItem(
   trend: ITrend & { _id: unknown },
@@ -62,4 +70,153 @@ export async function listTrends(filters: Partial<TrendFilters>): Promise<TrendL
 export async function listSources(): Promise<string[]> {
   await connectDB();
   return listDistinctSources();
+}
+
+export interface ScoredTrendCard {
+  id: string;
+  title: string;
+  source: string;
+  topicSlug: string;
+  topicName: string;
+  topicColor: string;
+  collectedAt: string;
+  score: {
+    total: number;
+    level: ScoreLevel;
+    scoredBy: "manual" | "llm";
+  };
+}
+
+export interface UnscoredTrendCard {
+  id: string;
+  title: string;
+  source: string;
+  topicSlug: string;
+  topicName: string;
+  topicColor: string;
+  collectedAt: string;
+}
+
+export interface TrendScoreDetail {
+  maturity: number;
+  applicability: number;
+  competitiveImpact: number;
+  strategicAlignment: number;
+  adoptionComplexity: number;
+  total: number;
+  level: ScoreLevel;
+  scoredBy: "manual" | "llm";
+  scoredAt: string;
+  notes?: string;
+}
+
+export interface TrendDetail {
+  id: string;
+  title: string;
+  summary: string;
+  url: string;
+  source: string;
+  topicSlug: string;
+  topicName: string;
+  topicColor: string;
+  collectedAt: string;
+  score?: TrendScoreDetail;
+}
+
+export async function getDashboardData(topicFilter?: string | null): Promise<{
+  scored: ScoredTrendCard[];
+  unscored: UnscoredTrendCard[];
+}> {
+  await connectDB();
+
+  const [scoredRaw, unscoredRaw, topics] = await Promise.all([
+    getScoredTrends(topicFilter),
+    getUnscoredTrends(topicFilter),
+    findAllTopics(),
+  ]);
+
+  const topicMap = new Map<string, ITopic>(topics.map((t) => [t.slug, t]));
+
+  function isoDate(d: unknown): string {
+    if (d instanceof Date) return d.toISOString();
+    return String(d);
+  }
+
+  const scored: ScoredTrendCard[] = (scoredRaw as Array<ITrend & { _id: unknown }>)
+    .filter((t) => t.score != null)
+    .map((t) => {
+      const topic = topicMap.get(t.topicSlug);
+      const levelConfig = getScoreLevel(t.score!.total);
+      return {
+        id: String(t._id),
+        title: t.title,
+        source: t.source,
+        topicSlug: t.topicSlug,
+        topicName: topic?.name ?? t.topicSlug,
+        topicColor: topic?.color ?? "blue",
+        collectedAt: isoDate(t.collectedAt),
+        score: {
+          total: t.score!.total,
+          level: levelConfig.level,
+          scoredBy: t.score!.scoredBy,
+        },
+      };
+    });
+
+  const unscored: UnscoredTrendCard[] = (unscoredRaw as Array<ITrend & { _id: unknown }>).map((t) => {
+    const topic = topicMap.get(t.topicSlug);
+    return {
+      id: String(t._id),
+      title: t.title,
+      source: t.source,
+      topicSlug: t.topicSlug,
+      topicName: topic?.name ?? t.topicSlug,
+      topicColor: topic?.color ?? "blue",
+      collectedAt: isoDate(t.collectedAt),
+    };
+  });
+
+  return { scored, unscored };
+}
+
+export async function getTrendDetail(id: string): Promise<TrendDetail | null> {
+  await connectDB();
+
+  const trend = (await getTrendById(id)) as (ITrend & { _id: unknown }) | null;
+  if (!trend) return null;
+
+  const topic = await findTopicBySlug(trend.topicSlug);
+
+  function isoDate(d: unknown): string {
+    if (d instanceof Date) return d.toISOString();
+    return String(d);
+  }
+
+  const score: TrendScoreDetail | undefined = trend.score
+    ? {
+        maturity: trend.score.maturity,
+        applicability: trend.score.applicability,
+        competitiveImpact: trend.score.competitiveImpact,
+        strategicAlignment: trend.score.strategicAlignment,
+        adoptionComplexity: trend.score.adoptionComplexity,
+        total: trend.score.total,
+        level: getScoreLevel(trend.score.total).level,
+        scoredBy: trend.score.scoredBy,
+        scoredAt: isoDate(trend.score.scoredAt),
+        notes: trend.score.notes,
+      }
+    : undefined;
+
+  return {
+    id: String(trend._id),
+    title: trend.title,
+    summary: trend.summary,
+    url: trend.url,
+    source: trend.source,
+    topicSlug: trend.topicSlug,
+    topicName: topic?.name ?? trend.topicSlug,
+    topicColor: topic?.color ?? "blue",
+    collectedAt: isoDate(trend.collectedAt),
+    score,
+  };
 }
