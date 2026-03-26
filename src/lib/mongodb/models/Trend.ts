@@ -44,7 +44,7 @@ const TrendSchema = new Schema<ITrend>(
   {
     title: { type: String, required: true, trim: true },
     summary: { type: String, required: true, trim: true },
-    url: { type: String, required: true, unique: true },
+    url: { type: String, required: true },
     source: { type: String, required: true },
     topicSlug: { type: String, required: true },
     collectedAt: { type: Date, required: true, default: Date.now },
