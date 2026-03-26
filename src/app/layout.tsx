@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import ThemeRegistry from "./ThemeRegistry";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -13,8 +14,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className="bg-gray-950 text-gray-100 min-h-screen">
-        {children}
+      <body>
+        <ThemeRegistry>{children}</ThemeRegistry>
       </body>
     </html>
   );

@@ -1,4 +1,11 @@
-import Link from "next/link";
+import NextLink from "next/link";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardActionArea from "@mui/material/CardActionArea";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
+import Chip from "@mui/material/Chip";
 import { TopicBadge } from "@/components/ui/TopicBadge";
 import { ScoreBadge } from "@/components/ui/ScoreBadge";
 import { ScoredTrendCard, UnscoredTrendCard } from "@/lib/trends/service";
@@ -19,34 +26,61 @@ export function TrendCard(props: TrendCardProps) {
   const { variant, id, title, source, topicName, topicColor, collectedAt } = props;
 
   return (
-    <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 flex flex-col gap-2 hover:border-zinc-700 transition-colors">
-      <div className="flex items-start justify-between gap-2">
-        <Link
-          href={`/trends/${id}`}
-          className="text-sm font-medium text-zinc-100 hover:text-white line-clamp-2 flex-1"
-        >
-          {title}
-        </Link>
+    <Card
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        transition: "box-shadow 0.15s",
+        "&:hover": { boxShadow: "0 4px 16px 0 rgb(0 0 0 / 0.10)" },
+      }}
+    >
+      <CardActionArea
+        component={NextLink}
+        href={`/trends/${id}`}
+        sx={{ flexGrow: 1, alignItems: "flex-start", display: "flex", flexDirection: "column" }}
+      >
+        <CardContent sx={{ width: "100%", pb: "12px !important" }}>
+          <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1, mb: 1.5 }}>
+            <Typography
+              variant="body2"
+              fontWeight={600}
+              color="text.primary"
+              sx={{
+                lineHeight: 1.45,
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+                flex: 1,
+              }}
+            >
+              {title}
+            </Typography>
 
-        {variant === "scored" ? (
-          <div className="flex flex-col items-end gap-1 shrink-0">
-            <ScoreBadge total={props.score.total} />
-            <span className="text-xs text-zinc-400 font-mono">
-              {props.score.total.toFixed(2)}
-            </span>
-          </div>
-        ) : (
-          <span className="shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-zinc-800 text-zinc-400 border border-zinc-700">
-            Não avaliado
-          </span>
-        )}
-      </div>
+            {variant === "scored" ? (
+              <Stack alignItems="flex-end" gap={0.5} flexShrink={0}>
+                <ScoreBadge total={props.score.total} />
+                <Typography variant="caption" color="text.secondary" fontFamily="monospace" fontWeight={700}>
+                  {props.score.total.toFixed(2)}
+                </Typography>
+              </Stack>
+            ) : (
+              <Chip
+                label="Pendente"
+                size="small"
+                sx={{ bgcolor: "#f1f5f9", color: "#94a3b8", fontSize: "0.7rem", height: 22, flexShrink: 0 }}
+              />
+            )}
+          </Box>
 
-      <div className="flex items-center gap-2 flex-wrap">
-        <TopicBadge name={topicName} color={topicColor} />
-        <span className="text-xs text-zinc-500">{source}</span>
-        <span className="text-xs text-zinc-600">{formatDate(collectedAt)}</span>
-      </div>
-    </div>
+          <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
+            <TopicBadge name={topicName} color={topicColor} />
+            <Typography variant="caption" color="text.secondary">{source}</Typography>
+            <Typography variant="caption" color="text.disabled">{formatDate(collectedAt)}</Typography>
+          </Stack>
+        </CardContent>
+      </CardActionArea>
+    </Card>
   );
 }

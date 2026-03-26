@@ -1,3 +1,7 @@
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import PendingActionsOutlinedIcon from "@mui/icons-material/PendingActionsOutlined";
 import { TrendCard } from "./TrendCard";
 import { UnscoredTrendCard } from "@/lib/trends/service";
 
@@ -9,15 +13,22 @@ export function AwaitingSection({ trends }: AwaitingSectionProps) {
   if (trends.length === 0) return null;
 
   return (
-    <section>
-      <h2 className="text-base font-semibold text-zinc-400 mb-3">
-        Aguardando avaliação ({trends.length})
-      </h2>
-      <div className="grid gap-3 sm:grid-cols-1 md:grid-cols-2">
+    <Box>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+        <PendingActionsOutlinedIcon sx={{ color: "text.secondary", fontSize: 20 }} />
+        <Typography variant="h6" color="text.secondary" fontSize="1rem">
+          Aguardando avaliação
+        </Typography>
+        <Typography variant="caption" color="text.disabled">({trends.length})</Typography>
+      </Box>
+
+      <Grid container spacing={2}>
         {trends.map((t) => (
-          <TrendCard key={t.id} variant="unscored" {...t} />
+          <Grid item xs={12} sm={6} md={4} key={t.id}>
+            <TrendCard variant="unscored" {...t} />
+          </Grid>
         ))}
-      </div>
-    </section>
+      </Grid>
+    </Box>
   );
 }

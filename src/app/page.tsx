@@ -1,4 +1,12 @@
 import { Suspense } from "react";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Container from "@mui/material/Container";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
+import PulseIcon from "@mui/icons-material/GraphicEq";
+import Divider from "@mui/material/Divider";
 import { getDashboardData } from "@/lib/trends/service";
 import { listTopics } from "@/lib/topics/service";
 import { RankedSection } from "@/components/dashboard/RankedSection";
@@ -24,25 +32,36 @@ export default async function Home({
   const isEmpty = scored.length === 0 && unscored.length === 0;
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-8 md:px-8">
-      <div className="max-w-5xl mx-auto flex flex-col gap-8">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-white">IAPulse</h1>
-        </div>
+    <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
+      <AppBar position="static" elevation={0}>
+        <Toolbar>
+          <PulseIcon sx={{ mr: 1, color: "primary.main" }} />
+          <Typography variant="h6" fontWeight={700} color="text.primary">
+            IAPulse
+          </Typography>
+          <Typography variant="caption" color="text.secondary" sx={{ ml: 1.5, mt: 0.3 }}>
+            Monitoramento de tendências em IA
+          </Typography>
+        </Toolbar>
+      </AppBar>
 
-        <Suspense fallback={null}>
-          <TopicFilterBar topics={topics} active={topic} />
-        </Suspense>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Stack spacing={4}>
+          <Suspense fallback={null}>
+            <TopicFilterBar topics={topics} active={topic} />
+          </Suspense>
 
-        {isEmpty ? (
-          <DashboardEmptyState />
-        ) : (
-          <>
-            <RankedSection trends={scored} />
-            <AwaitingSection trends={unscored} />
-          </>
-        )}
-      </div>
-    </main>
+          {isEmpty ? (
+            <DashboardEmptyState />
+          ) : (
+            <>
+              <RankedSection trends={scored} />
+              {unscored.length > 0 && <Divider />}
+              <AwaitingSection trends={unscored} />
+            </>
+          )}
+        </Stack>
+      </Container>
+    </Box>
   );
 }

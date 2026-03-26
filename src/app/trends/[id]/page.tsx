@@ -1,8 +1,14 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
+import NextLink from "next/link";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Container from "@mui/material/Container";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import MuiLink from "@mui/material/Link";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import GraphicEqIcon from "@mui/icons-material/GraphicEq";
 import { getTrendDetail } from "@/lib/trends/service";
-import { TrendDetailHeader } from "@/components/trend/TrendDetailHeader";
-import { ScoreDisplay } from "@/components/trend/ScoreDisplay";
 import { TrendDetailClient } from "./TrendDetailClient";
 
 export default async function TrendDetailPage({
@@ -15,38 +21,43 @@ export default async function TrendDetailPage({
 
   if (!trend) notFound();
 
+  const defaultValues = trend.score
+    ? {
+        maturity: trend.score.maturity,
+        applicability: trend.score.applicability,
+        competitiveImpact: trend.score.competitiveImpact,
+        strategicAlignment: trend.score.strategicAlignment,
+        adoptionComplexity: trend.score.adoptionComplexity,
+        notes: trend.score.notes ?? "",
+      }
+    : undefined;
+
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-8 md:px-8">
-      <div className="max-w-2xl mx-auto flex flex-col gap-6">
-        <Link href="/" className="text-sm text-zinc-500 hover:text-zinc-300">
-          ← Voltar ao dashboard
-        </Link>
+    <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
+      <AppBar position="static" elevation={0}>
+        <Toolbar>
+          <GraphicEqIcon sx={{ mr: 1, color: "primary.main" }} />
+          <Typography variant="h6" fontWeight={700} color="text.primary">
+            IAPulse
+          </Typography>
+        </Toolbar>
+      </AppBar>
 
-        <TrendDetailHeader
-          title={trend.title}
-          summary={trend.summary}
-          url={trend.url}
-          source={trend.source}
-          topicName={trend.topicName}
-          topicColor={trend.topicColor}
-          collectedAt={trend.collectedAt}
-        />
+      <Container maxWidth="md" sx={{ py: 4 }}>
+        <MuiLink
+          component={NextLink}
+          href="/"
+          underline="hover"
+          sx={{ display: "inline-flex", alignItems: "center", gap: 0.5, mb: 3 }}
+          color="text.secondary"
+          variant="body2"
+        >
+          <ArrowBackIcon sx={{ fontSize: 16 }} />
+          Voltar ao dashboard
+        </MuiLink>
 
-        {trend.score && <ScoreDisplay score={trend.score} />}
-
-        <TrendDetailClient
-          trendId={trend.id}
-          defaultValues={trend.score ? {
-            maturity: trend.score.maturity,
-            applicability: trend.score.applicability,
-            competitiveImpact: trend.score.competitiveImpact,
-            strategicAlignment: trend.score.strategicAlignment,
-            adoptionComplexity: trend.score.adoptionComplexity,
-            notes: trend.score.notes ?? "",
-          } : undefined}
-          showAutoScore={true}
-        />
-      </div>
-    </main>
+        <TrendDetailClient trend={trend} defaultValues={defaultValues} />
+      </Container>
+    </Box>
   );
 }

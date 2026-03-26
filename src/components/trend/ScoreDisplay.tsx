@@ -1,8 +1,19 @@
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Stack from "@mui/material/Stack";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableRow from "@mui/material/TableRow";
+import Chip from "@mui/material/Chip";
 import { ScoreBadge } from "@/components/ui/ScoreBadge";
 import { ScoreOriginBadge } from "@/components/scoring/ScoreOriginBadge";
 import { TrendScoreDetail } from "@/lib/trends/service";
 
-const CRITERIA_LABELS: Record<keyof Omit<TrendScoreDetail, "total" | "level" | "scoredBy" | "scoredAt" | "notes">, string> = {
+const CRITERIA_LABELS: Record<
+  keyof Omit<TrendScoreDetail, "total" | "level" | "scoredBy" | "scoredAt" | "notes">,
+  string
+> = {
   maturity: "Maturidade Tecnológica",
   applicability: "Aplicabilidade Imediata",
   competitiveImpact: "Impacto Competitivo",
@@ -23,30 +34,47 @@ export function ScoreDisplay({ score }: ScoreDisplayProps) {
   ][];
 
   return (
-    <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-5 flex flex-col gap-4">
-      <div className="flex items-center gap-3 flex-wrap">
+    <Box>
+      <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" mb={2}>
         <ScoreBadge total={score.total} />
-        <span className="text-lg font-semibold text-zinc-100 font-mono">
+        <Typography variant="h6" fontWeight={700} fontFamily="monospace">
           {score.total.toFixed(2)}
-          <span className="text-sm text-zinc-500 font-normal"> / 5.00</span>
-        </span>
+          <Typography component="span" variant="body2" color="text.secondary" fontWeight={400}>
+            {" "}/ 5.00
+          </Typography>
+        </Typography>
         <ScoreOriginBadge scoredBy={score.scoredBy} />
-      </div>
+      </Stack>
 
-      <table className="w-full text-sm">
-        <tbody className="divide-y divide-zinc-800">
+      <Table size="small">
+        <TableBody>
           {criteria.map(([key, label]) => (
-            <tr key={key}>
-              <td className="py-1.5 text-zinc-400">{label}</td>
-              <td className="py-1.5 text-right font-mono text-zinc-200 w-12">{score[key]} / 5</td>
-            </tr>
+            <TableRow key={key} sx={{ "&:last-child td": { border: 0 } }}>
+              <TableCell sx={{ color: "text.secondary", py: 0.75, pl: 0 }}>{label}</TableCell>
+              <TableCell align="right" sx={{ py: 0.75, pr: 0 }}>
+                <Chip
+                  label={`${score[key]} / 5`}
+                  size="small"
+                  sx={{
+                    fontFamily: "monospace",
+                    fontWeight: 700,
+                    bgcolor: "#f1f5f9",
+                    color: "text.primary",
+                    fontSize: "0.7rem",
+                    height: 20,
+                  }}
+                />
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
 
       {score.notes && (
-        <p className="text-xs text-zinc-400 border-t border-zinc-800 pt-3">{score.notes}</p>
+        <Typography variant="caption" color="text.secondary" display="block" mt={1.5}>
+          {score.notes}
+        </Typography>
       )}
-    </div>
+    </Box>
   );
 }

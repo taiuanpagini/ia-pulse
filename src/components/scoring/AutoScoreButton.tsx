@@ -1,71 +1,58 @@
 "use client";
 
 import { useState } from "react";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import Alert from "@mui/material/Alert";
+import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import { LLMScoreResponse } from "@/lib/scoring/schemas";
 
 interface AutoScoreButtonProps {
   trendId: string;
-  onSuggestion: (data: LLMScoreResponse) => void;
+  onSuggestion: (suggestion: LLMScoreResponse) => void;
 }
 
 export function AutoScoreButton({ trendId, onSuggestion }: AutoScoreButtonProps) {
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleClick = async () => {
     setError(null);
-    setIsLoading(true);
-
+    setLoading(true);
     try {
       const res = await fetch(`/api/trends/${trendId}/autoscore`, { method: "POST" });
-      const json = (await res.json()) as {
-        data?: LLMScoreResponse;
-        error?: { code?: string; message?: string };
-      };
-
+      const data = (await res.json()) as { data?: LLMScoreResponse; error?: { message: string } };
       if (!res.ok) {
-        const code = json.error?.code;
-        if (code === "LLM_TIMEOUT") {
-          setError("A IA demorou mais de 10s. Tente novamente.");
-        } else if (code === "LLM_NOT_CONFIGURED") {
-          setError("Chave de API não configurada.");
-        } else {
-          setError(json.error?.message ?? "Erro ao obter sugestão da IA.");
-        }
+        setError(data.error?.message ?? "Erro ao gerar sugestão");
         return;
       }
-
-      if (json.data) {
-        onSuggestion(json.data);
-      }
+      if (data.data) onSuggestion(data.data);
     } catch {
-      setError("Erro de conexão com a IA.");
+      setError("Erro de conexão");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col gap-2">
-      <button
-        type="button"
+    <div>
+      <Button
+        variant="outlined"
+        size="small"
         onClick={handleClick}
-        disabled={isLoading}
-        className="rounded-lg border border-violet-600 bg-violet-900/30 hover:bg-violet-900/50 disabled:opacity-50 text-violet-300 text-sm font-medium py-2 px-4 transition-colors flex items-center gap-2 justify-center"
+        disabled={loading}
+        startIcon={
+          loading ? <CircularProgress size={14} /> : <SmartToyOutlinedIcon fontSize="small" />
+        }
+        sx={{ mb: error ? 1 : 0 }}
       >
-        {isLoading ? (
-          <>
-            <span className="animate-spin inline-block w-4 h-4 border-2 border-violet-400 border-t-transparent rounded-full" />
-            Consultando IA...
-          </>
-        ) : (
-          <>
-            <span aria-hidden>🤖</span>
-            Auto-score com IA
-          </>
-        )}
-      </button>
-      {error && <p className="text-xs text-red-400">{error}</p>}
+        {loading ? "Analisando..." : "Auto-score com IA"}
+      </Button>
+      {error && (
+        <Alert severity="warning" sx={{ mt: 1, py: 0.5, fontSize: "0.75rem" }}>
+          {error}
+        </Alert>
+      )}
     </div>
   );
 }

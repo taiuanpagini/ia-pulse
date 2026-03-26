@@ -1,5 +1,5 @@
-"use client";
-
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import { ScoreBadge } from "@/components/ui/ScoreBadge";
 
 interface ScoreTotalDisplayProps {
@@ -9,17 +9,19 @@ interface ScoreTotalDisplayProps {
 export function ScoreTotalDisplay({ total }: ScoreTotalDisplayProps) {
   if (total === null) {
     return (
-      <div className="flex items-center gap-2">
-        <span className="text-2xl font-bold text-gray-600">—</span>
-        <span className="text-xs text-gray-500">preencha todos os critérios</span>
-      </div>
+      <Typography variant="body2" color="text.disabled" fontStyle="italic">
+        Preencha todos os critérios
+      </Typography>
     );
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <span className="text-3xl font-bold text-white">{total.toFixed(2)}</span>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+      <Typography variant="h5" fontWeight={800} fontFamily="monospace" color="primary.main">
+        {total.toFixed(2)}
+      </Typography>
+      <Typography variant="body2" color="text.secondary">/ 5.00</Typography>
       <ScoreBadge total={total} />
-    </div>
+    </Box>
   );
 }

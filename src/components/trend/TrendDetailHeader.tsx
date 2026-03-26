@@ -1,4 +1,8 @@
-import { ExternalLink } from "lucide-react";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Stack from "@mui/material/Stack";
+import Link from "@mui/material/Link";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { TopicBadge } from "@/components/ui/TopicBadge";
 import { TrendDetail } from "@/lib/trends/service";
 
@@ -25,29 +29,37 @@ export function TrendDetailHeader({
   collectedAt,
 }: TrendDetailHeaderProps) {
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-bold text-zinc-100 leading-snug">{title}</h1>
-      <p className="text-sm text-zinc-300 leading-relaxed">{summary}</p>
+    <Box>
+      <Typography variant="h5" fontWeight={700} color="text.primary" gutterBottom>
+        {title}
+      </Typography>
 
-      {url ? (
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 text-sm text-blue-400 hover:text-blue-300 w-fit"
-        >
-          Ver fonte original
-          <ExternalLink className="h-3.5 w-3.5" />
-        </a>
-      ) : (
-        <span className="text-sm text-zinc-500">URL não disponível</span>
-      )}
+      <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.75, mb: 2.5 }}>
+        {summary}
+      </Typography>
 
-      <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-500">
+      <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap">
         <TopicBadge name={topicName} color={topicColor} />
-        <span>{source}</span>
-        <span>{formatDate(collectedAt)}</span>
-      </div>
-    </div>
+        <Typography variant="caption" color="text.secondary">{source}</Typography>
+        <Typography variant="caption" color="text.disabled">{formatDate(collectedAt)}</Typography>
+
+        {url ? (
+          <Link
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            variant="caption"
+            sx={{ display: "inline-flex", alignItems: "center", gap: 0.3, ml: "auto" }}
+          >
+            Ver fonte original
+            <OpenInNewIcon sx={{ fontSize: 12 }} />
+          </Link>
+        ) : (
+          <Typography variant="caption" color="text.disabled" sx={{ ml: "auto" }}>
+            URL não disponível
+          </Typography>
+        )}
+      </Stack>
+    </Box>
   );
 }

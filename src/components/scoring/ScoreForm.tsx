@@ -3,9 +3,18 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMemo, useState } from "react";
+import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import Typography from "@mui/material/Typography";
+import Alert from "@mui/material/Alert";
+import Paper from "@mui/material/Paper";
+import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import { ScoreFormSchema, ScoreFormValues, LLMScoreResponse } from "@/lib/scoring/schemas";
 import { calculateScore } from "@/lib/scoring/formula";
-import { determineScoredBy, } from "@/lib/scoring/origin";
+import { determineScoredBy } from "@/lib/scoring/origin";
 import { ScoreCriteria } from "@/lib/scoring/formula";
 import { CriteriaInput } from "./CriteriaInput";
 import { ScoreTotalDisplay } from "./ScoreTotalDisplay";
@@ -42,8 +51,6 @@ export function ScoreForm({ trendId, defaultValues, showAutoScore = false, onSuc
   });
 
   const values = watch();
-
-  // NFR-001: calculateScore via useMemo — síncrono, < 200ms garantido
   const totalScore = useMemo(() => calculateScore(values), [values]);
 
   const handleLLMSuggestion = (suggestion: LLMScoreResponse) => {
@@ -96,8 +103,8 @@ export function ScoreForm({ trendId, defaultValues, showAutoScore = false, onSuc
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
-      <div className="flex flex-col gap-5">
+    <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+      <Stack spacing={3}>
         {CRITERIA.map((c) => (
           <CriteriaInput
             key={c.name}
@@ -109,39 +116,49 @@ export function ScoreForm({ trendId, defaultValues, showAutoScore = false, onSuc
             onChange={(v) => setValue(c.name, v)}
           />
         ))}
-      </div>
 
-      <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-gray-300" htmlFor="notes">
-          Notas (opcional)
-        </label>
-        <textarea
-          id="notes"
-          {...register("notes")}
-          rows={3}
+        <TextField
+          label="Notas (opcional)"
           placeholder="Justificativa ou contexto adicional..."
-          className="rounded-lg bg-gray-800 border border-gray-700 text-sm text-gray-200 px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+          multiline
+          rows={3}
+          size="small"
+          fullWidth
+          {...register("notes")}
         />
-      </div>
 
-      <div className="rounded-xl bg-gray-800/50 border border-gray-700 p-4 flex items-center justify-between">
-        <span className="text-sm text-gray-400">Score total</span>
-        <ScoreTotalDisplay total={totalScore} />
-      </div>
+        <Paper
+          variant="outlined"
+          sx={{ p: 2, display: "flex", alignItems: "center", justifyContent: "space-between", borderRadius: 2 }}
+        >
+          <Typography variant="body2" color="text.secondary" fontWeight={600}>
+            Score total
+          </Typography>
+          <ScoreTotalDisplay total={totalScore} />
+        </Paper>
 
-      {showAutoScore && (
-        <AutoScoreButton trendId={trendId} onSuggestion={handleLLMSuggestion} />
-      )}
+        {showAutoScore && (
+          <>
+            <Divider>
+              <Typography variant="caption" color="text.disabled">ou</Typography>
+            </Divider>
+            <AutoScoreButton trendId={trendId} onSuggestion={handleLLMSuggestion} />
+          </>
+        )}
 
-      {saveError && <p className="text-sm text-red-400">{saveError}</p>}
+        {saveError && <Alert severity="error">{saveError}</Alert>}
 
-      <button
-        type="submit"
-        disabled={totalScore === null || isSaving}
-        className="rounded-lg bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:text-gray-500 text-white font-semibold py-3 transition-colors"
-      >
-        {isSaving ? "Salvando..." : "Salvar avaliação"}
-      </button>
-    </form>
+        <Button
+          type="submit"
+          variant="contained"
+          disabled={totalScore === null || isSaving}
+          startIcon={<SaveOutlinedIcon />}
+          size="large"
+          fullWidth
+        >
+          {isSaving ? "Salvando..." : "Salvar avaliação"}
+        </Button>
+      </Stack>
+    </Box>
   );
 }

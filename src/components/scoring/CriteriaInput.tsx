@@ -1,57 +1,87 @@
-"use client";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import Tooltip from "@mui/material/Tooltip";
 
 interface CriteriaInputProps {
   name: string;
   label: string;
   description: string;
-  value: number | undefined;
+  isInverted: boolean;
+  value?: number;
   onChange: (v: number) => void;
-  isInverted?: boolean;
 }
 
-const OPTIONS = [1, 2, 3, 4, 5] as const;
+const OPTIONS = [1, 2, 3, 4, 5];
+
+const INVERTED_LABELS: Record<number, string> = {
+  1: "Simples",
+  2: "Pouco complexa",
+  3: "Moderada",
+  4: "Complexa",
+  5: "Muito complexa",
+};
+
+const NORMAL_LABELS: Record<number, string> = {
+  1: "Muito baixo",
+  2: "Baixo",
+  3: "Médio",
+  4: "Alto",
+  5: "Muito alto",
+};
 
 export function CriteriaInput({
-  name,
   label,
   description,
+  isInverted,
   value,
   onChange,
-  isInverted = false,
 }: CriteriaInputProps) {
+  const tooltipLabels = isInverted ? INVERTED_LABELS : NORMAL_LABELS;
+
   return (
-    <div className="flex flex-col gap-2">
-      <div>
-        <span className="text-sm font-medium text-gray-200">{label}</span>
-        <span className="ml-2 text-xs text-gray-500">{description}</span>
-        {isInverted && (
-          <p className="text-xs text-amber-500 mt-0.5">5 = muito complexa (pior) · 1 = simples (melhor)</p>
-        )}
-      </div>
-      <div
-        role="radiogroup"
-        aria-label={label}
-        className="flex gap-2"
+    <Box>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", mb: 0.75 }}>
+        <Typography variant="body2" fontWeight={600} color="text.primary">
+          {label}
+        </Typography>
+        <Typography variant="caption" color="text.secondary">
+          {description}
+        </Typography>
+      </Box>
+      <ToggleButtonGroup
+        value={value ?? null}
+        exclusive
+        onChange={(_, v) => { if (v !== null) onChange(v as number); }}
+        size="small"
+        fullWidth
+        sx={{ gap: 0.5 }}
       >
         {OPTIONS.map((opt) => (
-          <button
-            key={opt}
-            type="button"
-            role="radio"
-            aria-checked={value === opt}
-            aria-label={`${label}: ${opt}`}
-            onClick={() => onChange(opt)}
-            className={`w-10 h-10 rounded-lg border text-sm font-semibold transition-colors
-              ${
-                value === opt
-                  ? "bg-blue-600 border-blue-500 text-white"
-                  : "bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700"
-              }`}
-          >
-            {opt}
-          </button>
+          <Tooltip key={opt} title={tooltipLabels[opt]} placement="top" arrow>
+            <ToggleButton
+              value={opt}
+              sx={{
+                flex: 1,
+                fontWeight: 700,
+                fontSize: "0.875rem",
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: "8px !important",
+                "&.Mui-selected": {
+                  bgcolor: "primary.main",
+                  color: "white",
+                  borderColor: "primary.main",
+                  "&:hover": { bgcolor: "primary.dark" },
+                },
+              }}
+            >
+              {opt}
+            </ToggleButton>
+          </Tooltip>
         ))}
-      </div>
-    </div>
+      </ToggleButtonGroup>
+    </Box>
   );
 }
