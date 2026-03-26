@@ -30,7 +30,7 @@ const CRITERIA: {
   { name: "applicability", label: "Aplicabilidade Imediata", description: "30% · 1=nenhuma, 5=direta", isInverted: false },
   { name: "competitiveImpact", label: "Impacto Competitivo", description: "25% · 1=incremental, 5=disruptivo", isInverted: false },
   { name: "strategicAlignment", label: "Alinhamento Estratégico", description: "15% · 1=baixo, 5=alto", isInverted: false },
-  { name: "adoptionComplexity", label: "Complexidade de Adoção", description: "10% · invertido", isInverted: true },
+  { name: "adoptionComplexity", label: "Facilidade de Adoção", description: "10% · 1=muito complexa, 5=simples", isInverted: true },
 ];
 
 export interface ScoreFormProps {

@@ -3,7 +3,7 @@ export interface ScoreCriteria {
   applicability: number;
   competitiveImpact: number;
   strategicAlignment: number;
-  adoptionComplexity: number; // 5=muito complexa; inversão aplicada na fórmula
+  adoptionComplexity: number; // 1=muito complexa, 5=simples (5=melhor)
 }
 
 export function calculateScore(criteria: Partial<ScoreCriteria>): number | null {
@@ -25,7 +25,7 @@ export function calculateScore(criteria: Partial<ScoreCriteria>): number | null 
     applicability * 0.3 +
     competitiveImpact * 0.25 +
     strategicAlignment * 0.15 +
-    (6 - adoptionComplexity) * 0.1; // inversão: 5=pior → contribui 0.1×1=0.1
+    adoptionComplexity * 0.1;
 
   return Math.round(total * 100) / 100;
 }

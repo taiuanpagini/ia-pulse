@@ -9,7 +9,7 @@ Critérios:
 - applicability: Aplicabilidade Imediata (1=nenhuma, 5=direta)
 - competitiveImpact: Impacto Competitivo (1=incremental, 5=disruptivo)
 - strategicAlignment: Alinhamento Estratégico (1=baixo, 5=alto)
-- adoptionComplexity: Complexidade de Adoção (1=simples, 5=muito complexa — INVERTIDO: 5 é pior)
+- adoptionComplexity: Facilidade de Adoção (1=muito complexa/difícil de adotar, 5=muito simples/fácil de adotar)
 
 Responda APENAS com JSON válido, sem texto extra:
 {"maturity":N,"applicability":N,"competitiveImpact":N,"strategicAlignment":N,"adoptionComplexity":N}`;

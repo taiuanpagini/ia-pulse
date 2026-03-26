@@ -15,12 +15,13 @@ interface CriteriaInputProps {
 
 const OPTIONS = [1, 2, 3, 4, 5];
 
-const INVERTED_LABELS: Record<number, string> = {
-  1: "Simples",
-  2: "Pouco complexa",
+// Escala direta: 5=melhor (facilidade de adoção alta = bom)
+const ADOPTION_LABELS: Record<number, string> = {
+  1: "Muito complexa",
+  2: "Complexa",
   3: "Moderada",
-  4: "Complexa",
-  5: "Muito complexa",
+  4: "Pouco complexa",
+  5: "Muito simples",
 };
 
 const NORMAL_LABELS: Record<number, string> = {
@@ -38,7 +39,7 @@ export function CriteriaInput({
   value,
   onChange,
 }: CriteriaInputProps) {
-  const tooltipLabels = isInverted ? INVERTED_LABELS : NORMAL_LABELS;
+  const tooltipLabels = isInverted ? ADOPTION_LABELS : NORMAL_LABELS;
 
   return (
     <Box>
