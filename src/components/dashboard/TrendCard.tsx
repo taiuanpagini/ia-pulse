@@ -30,7 +30,7 @@ export function TrendCard(props: TrendCardProps) {
   return (
     <Card
       sx={{
-        width: "100%",
+        minWidth: 0,
         display: "flex",
         flexDirection: "column",
         transition: "box-shadow 0.15s, border-color 0.15s",

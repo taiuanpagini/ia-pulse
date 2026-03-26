@@ -1,5 +1,4 @@
 import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import EmojiEventsOutlinedIcon from "@mui/icons-material/EmojiEventsOutlined";
 import BarChartIcon from "@mui/icons-material/BarChart";
@@ -47,13 +46,11 @@ export function RankedSection({ trends, total, page, limit }: RankedSectionProps
         </Box>
       ) : (
         <>
-        <Grid container spacing={2}>
-          {trends.map((t) => (
-            <Grid item xs={4} key={t.id} sx={{ display: "flex" }}>
-                <TrendCard variant="scored" {...t} />
-              </Grid>
+          <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 2 }}>
+            {trends.map((t) => (
+              <TrendCard key={t.id} variant="scored" {...t} />
             ))}
-          </Grid>
+          </Box>
           <Pagination page={page} total={total} limit={limit} />
         </>
       )}
