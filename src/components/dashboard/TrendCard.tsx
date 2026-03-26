@@ -28,7 +28,7 @@ export function TrendCard(props: TrendCardProps) {
   return (
     <Card
       sx={{
-        height: "100%",
+        width: "100%",
         display: "flex",
         flexDirection: "column",
         transition: "box-shadow 0.15s",
@@ -38,18 +38,27 @@ export function TrendCard(props: TrendCardProps) {
       <CardActionArea
         component={NextLink}
         href={`/trends/${id}`}
-        sx={{ flexGrow: 1, alignItems: "flex-start", display: "flex", flexDirection: "column" }}
+        sx={{ flexGrow: 1, display: "flex", flexDirection: "column", alignItems: "stretch" }}
       >
-        <CardContent sx={{ width: "100%", pb: "12px !important" }}>
-          <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1, mb: 1.5 }}>
+        <CardContent
+          sx={{
+            flexGrow: 1,
+            display: "flex",
+            flexDirection: "column",
+            gap: 1.5,
+            pb: "16px !important",
+          }}
+        >
+          {/* Título ocupa espaço disponível, empurrando os badges para baixo */}
+          <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1 }}>
             <Typography
               variant="body2"
               fontWeight={600}
               color="text.primary"
               sx={{
-                lineHeight: 1.45,
+                lineHeight: 1.5,
                 display: "-webkit-box",
-                WebkitLineClamp: 2,
+                WebkitLineClamp: 3,
                 WebkitBoxOrient: "vertical",
                 overflow: "hidden",
                 flex: 1,
@@ -74,7 +83,8 @@ export function TrendCard(props: TrendCardProps) {
             )}
           </Box>
 
-          <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center">
+          {/* Metadados fixados na parte de baixo do card */}
+          <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center" mt="auto">
             <TopicBadge name={topicName} color={topicColor} />
             <Typography variant="caption" color="text.secondary">{source}</Typography>
             <Typography variant="caption" color="text.disabled">{formatDate(collectedAt)}</Typography>

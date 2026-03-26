@@ -22,9 +22,9 @@ export function AwaitingSection({ trends }: AwaitingSectionProps) {
         <Typography variant="caption" color="text.disabled">({trends.length})</Typography>
       </Box>
 
-      <Grid container spacing={2}>
+      <Grid container spacing={2} alignItems="stretch">
         {trends.map((t) => (
-          <Grid item xs={12} sm={6} md={4} key={t.id}>
+          <Grid item xs={12} sm={6} md={4} key={t.id} sx={{ display: "flex" }}>
             <TrendCard variant="unscored" {...t} />
           </Grid>
         ))}

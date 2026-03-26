@@ -11,8 +11,14 @@
     "seed": "npx tsx --tsconfig tsconfig.scripts.json src/scripts/seed-topics.ts"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/server": "^11.11.0",
+    "@emotion/styled": "^11.14.1",
     "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^5.2.2",
+    "@mui/icons-material": "^7.3.9",
+    "@mui/material": "^7.3.9",
+    "@mui/material-nextjs": "^7.3.9",
     "fast-xml-parser": "^4.5.3",
     "lucide-react": "^1.7.0",
     "mongoose": "^8.13.2",
