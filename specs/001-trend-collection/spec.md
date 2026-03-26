@@ -167,14 +167,15 @@ Scenario: Base de dados inacessível
 - **FR-003**: O sistema DEVE coletar posts populares do Reddit (r/MachineLearning e r/artificial)
 - **FR-004**: O sistema DEVE coletar papers do Semantic Scholar
 - **FR-005**: O sistema DEVE coletar papers e benchmarks do Papers With Code
-- **FR-006**: O sistema DEVE coletar conteúdo dos seguintes feeds RSS — Infraestrutura: NVIDIA Developer Blog, Hugging Face Blog, Google AI Blog; Regulamentação: EUR-Lex (AI Act), ANPD, NIST AI RMF, Future of Life Institute, AI Now Institute, Stanford HAI; Geral: The Batch, Import AI, VentureBeat AI, MIT Technology Review AI
-- **FR-007**: Cada item coletado DEVE ser associado a um tópico (Infraestrutura, Regulamentação ou Geral)
+- **FR-006**: O sistema DEVE coletar conteúdo dos seguintes feeds RSS (configuração inicial) — Infraestrutura: NVIDIA Developer Blog, Hugging Face Blog, Google AI Blog; Regulamentação: EUR-Lex (AI Act), ANPD, NIST AI RMF, Future of Life Institute, AI Now Institute, Stanford HAI; Geral: The Batch, Import AI, VentureBeat AI, MIT Technology Review AI
+- **FR-007**: Cada item coletado DEVE ser associado a um tópico pelo slug; o tópico é determinado pela configuração da fonte, não por lógica hardcoded
 - **FR-008**: O sistema DEVE descartar itens cuja URL já existe na base de dados (deduplicação)
 - **FR-009**: A coleta DEVE ser executada automaticamente uma vez por dia às 07:00 UTC
 - **FR-010**: O endpoint de coleta DEVE rejeitar requisições sem credencial válida
 - **FR-011**: A falha na coleta de uma fonte DEVE ser isolada e não interromper a coleta das demais
 - **FR-012**: O resultado de cada execução DEVE registrar, por fonte: status (sucesso/falha), quantidade de itens novos coletados e, em caso de falha, descrição do erro
 - **FR-013**: O sistema DEVE expor `GET /api/health` que verifica e reporta a conectividade com a base de dados
+- **FR-014**: O sistema DEVE suportar adição de novas fontes RSS sem alteração de código — cada feed é configurado com URL, nome da fonte e slug do tópico associado; novos temas podem ser monitorados apenas adicionando entradas na configuração
 
 ### Non-Functional Requirements
 

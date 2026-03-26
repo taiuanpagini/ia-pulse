@@ -46,13 +46,18 @@
 
 ---
 
-## Rastreabilidade: NFR → Test Scenarios
+## Rastreabilidade: NFR → Test Scenarios (atualizado)
+
+---
+
+## Rastreabilidade: NFR → Test Scenarios (atualizado)
 
 | Requisito | Cenários que cobrem |
 |---|---|
 | NFR-001 (Listagem < 2s) | TS-NFR-001 |
 | NFR-002 (Filtros identificáveis e removíveis) | TS-EC-004 |
 | NFR-003 (Slug imutável) | TS-NFR-002, TS-EC-003 |
+| NFR-004 (Consistência visual de tags) | Validar manualmente nas três páginas — consistência cross-page não é automatizável por cenário unitário |
 
 ---
 

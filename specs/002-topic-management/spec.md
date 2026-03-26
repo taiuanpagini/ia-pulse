@@ -155,7 +155,7 @@ Scenario: Visualizar lista de tópicos cadastrados
 - **FR-005**: O sistema DEVE permitir filtrar a listagem por período de coleta
 - **FR-006**: O sistema DEVE suportar combinação simultânea de múltiplos filtros
 - **FR-007**: O sistema DEVE exibir mensagem de ausência de resultados quando nenhuma tendência corresponder aos filtros aplicados
-- **FR-008**: O sistema DEVE permitir cadastrar tópicos com nome, slug único e descrição
+- **FR-008**: O sistema DEVE permitir cadastrar qualquer número de tópicos com nome, slug único e descrição, sem limite fixo de categorias — novos temas de monitoramento podem ser adicionados a qualquer momento
 - **FR-009**: O sistema DEVE impedir o cadastro de tópicos com slug duplicado
 - **FR-010**: O sistema DEVE permitir editar a descrição de um tópico existente
 - **FR-011**: O sistema DEVE listar todos os tópicos cadastrados
@@ -167,6 +167,7 @@ Scenario: Visualizar lista de tópicos cadastrados
 - **NFR-001 (Performance)**: A listagem com filtros aplicados DEVE retornar resultados em menos de 2 segundos
 - **NFR-002 (Usabilidade)**: Os filtros ativos DEVEM ser visualmente identificáveis e individualmente removíveis
 - **NFR-003 (Consistência)**: O slug de um tópico DEVE ser imutável após o cadastro para garantir consistência das associações
+- **NFR-004 (Consistência visual)**: A tag de cada tópico DEVE usar a mesma cor em todas as páginas do sistema — listagem, dashboard e detalhe; a cor é atribuída ao tópico e não à página
 
 ### Key Entities
 

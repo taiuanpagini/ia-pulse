@@ -42,6 +42,7 @@
 | FR-011 (Isolamento de falhas) | TS-US02-001, TS-US02-003, TS-EC-001, TS-EC-003 |
 | FR-012 (Log por fonte) | TS-US02-001, TS-US02-002, TS-US02-003, TS-EC-001, TS-EC-002, TS-EC-003, TS-EC-004 |
 | FR-013 (Health endpoint) | TS-US04-001, TS-US04-002, TS-US04-003 |
+| FR-014 (RSS configurável por arquivo) | Validar manualmente ao adicionar novo tema — sem cenário automatizável específico |
 
 ---
 
