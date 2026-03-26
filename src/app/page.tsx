@@ -12,8 +12,7 @@ import { listTopics } from "@/lib/topics/service";
 import { RankedSection } from "@/components/dashboard/RankedSection";
 import { AwaitingSection } from "@/components/dashboard/AwaitingSection";
 import { DashboardEmptyState } from "@/components/dashboard/DashboardEmptyState";
-import { TopicFilterBar } from "@/components/dashboard/TopicFilterBar";
-import { SearchInput } from "@/components/dashboard/SearchInput";
+import { DashboardFilters } from "@/components/dashboard/DashboardFilters";
 
 const PAGE_LIMIT = 24;
 
@@ -53,16 +52,16 @@ export default async function Home({
       </AppBar>
 
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Stack spacing={3}>
-          {/* Barra de filtros e busca */}
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="flex-start">
-            <Suspense fallback={null}>
-              <SearchInput />
-            </Suspense>
-            <Suspense fallback={null}>
-              <TopicFilterBar topics={topics} active={topic} />
-            </Suspense>
-          </Stack>
+        <Stack spacing={4}>
+          <Suspense fallback={null}>
+            <DashboardFilters
+              topics={topics}
+              active={topic}
+              totalScored={scoredTotal}
+              totalUnscored={unscoredTotal}
+              search={q}
+            />
+          </Suspense>
 
           {isEmpty ? (
             <DashboardEmptyState />
