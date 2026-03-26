@@ -47,9 +47,9 @@ export function RankedSection({ trends, total, page, limit }: RankedSectionProps
         </Box>
       ) : (
         <>
-          <Grid container spacing={2} alignItems="stretch">
-            {trends.map((t) => (
-              <Grid item xs={12} sm={6} md={4} key={t.id} sx={{ display: "flex" }}>
+        <Grid container spacing={2}>
+          {trends.map((t) => (
+            <Grid item xs={4} key={t.id} sx={{ display: "flex" }}>
                 <TrendCard variant="scored" {...t} />
               </Grid>
             ))}

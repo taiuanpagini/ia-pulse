@@ -14,6 +14,9 @@ type TrendCardProps =
   | ({ variant: "scored" } & ScoredTrendCard)
   | ({ variant: "unscored" } & UnscoredTrendCard);
 
+const CARD_HEIGHT = 172;
+const TITLE_LINES = 2;
+
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("pt-BR", {
     day: "2-digit",
@@ -29,28 +32,29 @@ export function TrendCard(props: TrendCardProps) {
     <Card
       sx={{
         width: "100%",
+        height: CARD_HEIGHT,
         display: "flex",
         flexDirection: "column",
-        transition: "box-shadow 0.15s",
-        "&:hover": { boxShadow: "0 4px 16px 0 rgb(0 0 0 / 0.10)" },
+        transition: "box-shadow 0.15s, border-color 0.15s",
+        "&:hover": { boxShadow: "0 4px 16px 0 rgb(0 0 0 / 0.10)", borderColor: "primary.light" },
       }}
     >
       <CardActionArea
         component={NextLink}
         href={`/trends/${id}`}
-        sx={{ flexGrow: 1, display: "flex", flexDirection: "column", alignItems: "stretch" }}
+        sx={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "stretch" }}
       >
         <CardContent
           sx={{
-            flexGrow: 1,
+            height: "100%",
             display: "flex",
             flexDirection: "column",
-            gap: 1.5,
+            p: 2,
             pb: "16px !important",
           }}
         >
-          {/* Título ocupa espaço disponível, empurrando os badges para baixo */}
-          <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1 }}>
+          {/* Score badge — topo direito */}
+          <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1, mb: 1 }}>
             <Typography
               variant="body2"
               fontWeight={600}
@@ -58,7 +62,7 @@ export function TrendCard(props: TrendCardProps) {
               sx={{
                 lineHeight: 1.5,
                 display: "-webkit-box",
-                WebkitLineClamp: 3,
+                WebkitLineClamp: TITLE_LINES,
                 WebkitBoxOrient: "vertical",
                 overflow: "hidden",
                 flex: 1,
@@ -83,18 +87,18 @@ export function TrendCard(props: TrendCardProps) {
             )}
           </Box>
 
-          {/* Metadados fixados na parte de baixo do card */}
-          <Stack direction="row" spacing={1} flexWrap="wrap" alignItems="center" mt="auto">
+          {/* Metadados — sempre no rodapé */}
+          <Stack direction="row" spacing={0.75} flexWrap="wrap" alignItems="center" mt="auto">
             <TopicBadge name={topicName} color={topicColor} />
-            <Typography variant="caption" color="text.secondary">{source}</Typography>
-            <Typography variant="caption" color="text.disabled">{formatDate(collectedAt)}</Typography>
-            {props.lang === "pt" || props.titlePt ? (
+            <Typography variant="caption" color="text.secondary" noWrap>{source}</Typography>
+            <Typography variant="caption" color="text.disabled" noWrap>{formatDate(collectedAt)}</Typography>
+            {(props.lang === "pt" || props.titlePt) && (
               <Chip
                 label={props.lang === "pt" ? "PT-BR" : "Traduzido"}
                 size="small"
                 sx={{ bgcolor: "#dcfce7", color: "#166534", fontSize: "0.65rem", height: 18, "& .MuiChip-label": { px: 0.75 } }}
               />
-            ) : null}
+            )}
           </Stack>
         </CardContent>
       </CardActionArea>

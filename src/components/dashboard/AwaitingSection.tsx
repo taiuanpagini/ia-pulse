@@ -26,9 +26,9 @@ export function AwaitingSection({ trends, total, page, limit }: AwaitingSectionP
         <Typography variant="caption" color="text.disabled">({trends.length})</Typography>
       </Box>
 
-      <Grid container spacing={2} alignItems="stretch">
+      <Grid container spacing={2}>
         {trends.map((t) => (
-          <Grid item xs={12} sm={6} md={4} key={t.id} sx={{ display: "flex" }}>
+          <Grid item xs={4} key={t.id} sx={{ display: "flex" }}>
             <TrendCard variant="unscored" {...t} />
           </Grid>
         ))}
