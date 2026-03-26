@@ -1,3 +1,11 @@
+import path from "path";
+
+try {
+  process.loadEnvFile(path.resolve(process.cwd(), ".env.local"));
+} catch {
+  // .env.local optional in CI/production
+}
+
 import { connectDB } from "@/lib/mongodb/client";
 import { Topic } from "@/lib/mongodb/models/Topic";
 

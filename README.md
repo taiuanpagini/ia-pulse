@@ -131,7 +131,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ### 3. Popular o banco com os tópicos iniciais
 
 ```bash
-npx ts-node -r tsconfig-paths/register src/scripts/seed-topics.ts
+npm run seed
 ```
 
 Isso cria os tópicos **Infraestrutura**, **Regulamentação** e **Geral** no MongoDB.

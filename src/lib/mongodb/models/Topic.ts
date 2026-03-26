@@ -27,7 +27,7 @@ export interface ITopic extends Document {
 const TopicSchema = new Schema<ITopic>(
   {
     name: { type: String, required: true, trim: true },
-    slug: { type: String, required: true, unique: true, immutable: true, lowercase: true, trim: true },
+    slug: { type: String, required: true, immutable: true, lowercase: true, trim: true },
     description: { type: String, required: true, trim: true },
     color: { type: String, enum: TOPIC_COLOR_PALETTE, default: "blue" },
   },
