@@ -27,25 +27,33 @@ export function Pagination({ page, total, limit }: PaginationProps) {
   }
 
   return (
-    <Stack direction="row" alignItems="center" justifyContent="flex-end" spacing={1}>
+    <Stack
+      direction="row"
+      alignItems="center"
+      justifyContent="center"
+      spacing={2}
+      sx={{ mt: 3, pt: 3, borderTop: "1px solid", borderColor: "divider" }}
+    >
       <Button
-        size="small"
         startIcon={<ArrowBackIcon />}
         onClick={() => navigate(page - 1)}
         disabled={page <= 1}
         variant="outlined"
+        sx={{ minWidth: 120 }}
       >
         Anterior
       </Button>
-      <Typography variant="caption" color="text.secondary" px={1}>
-        {page} / {totalPages}
+
+      <Typography variant="body2" color="text.secondary" sx={{ minWidth: 80, textAlign: "center" }}>
+        Página <strong>{page}</strong> de <strong>{totalPages}</strong>
       </Typography>
+
       <Button
-        size="small"
         endIcon={<ArrowForwardIcon />}
         onClick={() => navigate(page + 1)}
         disabled={page >= totalPages}
         variant="outlined"
+        sx={{ minWidth: 120 }}
       >
         Próxima
       </Button>
