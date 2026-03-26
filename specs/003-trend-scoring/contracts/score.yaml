@@ -1,0 +1,273 @@
+openapi: "3.1.0"
+info:
+  title: IAPulse — Trend Scoring API
+  version: "1.0.0"
+
+paths:
+  /api/trends/{id}/score:
+    patch:
+      summary: Salva ou atualiza o score de uma tendência
+      description: >
+        Registra a avaliação ponderada de uma tendência com os 5 critérios.
+        O campo `scoredBy` indica se a avaliação foi feita manualmente ou confirmada a partir de sugestão da IA.
+        Se a tendência já possuía score, ele é sobrescrito.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID MongoDB da tendência
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScoreInput"
+            examples:
+              manual:
+                summary: Avaliação manual
+                value:
+                  maturity: 4
+                  applicability: 5
+                  competitiveImpact: 4
+                  strategicAlignment: 3
+                  adoptionComplexity: 2
+                  notes: "Tecnologia já em uso em empresas de ponta. Alta aplicabilidade imediata."
+                  scoredBy: "manual"
+              llm:
+                summary: Avaliação confirmada da IA (sem modificações)
+                value:
+                  maturity: 3
+                  applicability: 4
+                  competitiveImpact: 5
+                  strategicAlignment: 4
+                  adoptionComplexity: 3
+                  scoredBy: "llm"
+      responses:
+        "200":
+          description: Score salvo com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScoreResponse"
+              example:
+                data:
+                  id: "660d1a2b3c4e5f6a7b8c9d10"
+                  score:
+                    maturity: 4
+                    applicability: 5
+                    competitiveImpact: 4
+                    strategicAlignment: 3
+                    adoptionComplexity: 2
+                    total: 4.20
+                    scoredBy: "manual"
+                    scoredAt: "2026-03-25T10:30:00.000Z"
+                    notes: "Tecnologia já em uso em empresas de ponta."
+        "404":
+          description: Tendência não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error:
+                  code: "TREND_NOT_FOUND"
+                  message: "Tendência não encontrada"
+        "422":
+          description: Input inválido (critério fora do range 1-5 ou campo ausente)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error:
+                  code: "VALIDATION_ERROR"
+                  message: "maturity: Number must be less than or equal to 5"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/trends/{id}/autoscore:
+    post:
+      summary: Solicita sugestão de score automático via LLM
+      description: >
+        Envia o título e resumo da tendência para a LLM configurada e retorna sugestões de valores
+        para os 5 critérios. O cliente deve apresentar os valores ao analista para revisão antes de salvar.
+        Retorna 503 se a integração LLM não estiver configurada.
+        Retorna 504 se a LLM não responder em 10 segundos (NFR-002).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Sugestão da LLM retornada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AutoScoreResponse"
+              example:
+                data:
+                  maturity: 3
+                  applicability: 4
+                  competitiveImpact: 5
+                  strategicAlignment: 4
+                  adoptionComplexity: 3
+        "404":
+          description: Tendência não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Integração com IA não configurada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error:
+                  code: "LLM_NOT_CONFIGURED"
+                  message: "LLM_API_KEY not configured"
+        "504":
+          description: Timeout da LLM (> 10s)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error:
+                  code: "LLM_TIMEOUT"
+                  message: "Auto-score timed out after 10 seconds"
+        "422":
+          description: LLM retornou valores inválidos (fora do range 1-5)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error:
+                  code: "LLM_INVALID_RESPONSE"
+                  message: "A IA retornou valores inválidos — por favor avalie manualmente"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+components:
+  schemas:
+    ScoreCriteria:
+      type: object
+      required:
+        - maturity
+        - applicability
+        - competitiveImpact
+        - strategicAlignment
+        - adoptionComplexity
+      properties:
+        maturity:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: "Maturidade Tecnológica (peso 20%): 1=pesquisa, 5=produção"
+        applicability:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: "Aplicabilidade Imediata (peso 30%): 1=nenhuma, 5=direta"
+        competitiveImpact:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: "Impacto Competitivo (peso 25%): 1=incremental, 5=disruptivo"
+        strategicAlignment:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: "Alinhamento Estratégico (peso 15%): 1=baixo, 5=alto"
+        adoptionComplexity:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: "Complexidade de Adoção (peso 10%, INVERTIDO): 5=muito complexa (pior), 1=simples (melhor)"
+
+    ScoreInput:
+      allOf:
+        - $ref: "#/components/schemas/ScoreCriteria"
+        - type: object
+          required: [scoredBy]
+          properties:
+            notes:
+              type: string
+              maxLength: 2000
+            scoredBy:
+              type: string
+              enum: [manual, llm]
+              description: >
+                "manual" = analista preencheu ou modificou ao menos um valor sugerido.
+                "llm" = analista confirmou sugestão da IA sem nenhuma modificação.
+
+    ScoreResult:
+      allOf:
+        - $ref: "#/components/schemas/ScoreCriteria"
+        - type: object
+          required: [total, scoredBy, scoredAt]
+          properties:
+            total:
+              type: number
+              minimum: 1.0
+              maximum: 5.0
+              description: "Score calculado: (mat×0.2)+(app×0.3)+(imp×0.25)+(ali×0.15)+((6-cmp)×0.1)"
+            scoredBy:
+              type: string
+              enum: [manual, llm]
+            scoredAt:
+              type: string
+              format: date-time
+            notes:
+              type: string
+
+    ScoreResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [id, score]
+          properties:
+            id:
+              type: string
+            score:
+              $ref: "#/components/schemas/ScoreResult"
+
+    AutoScoreResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: "#/components/schemas/ScoreCriteria"
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+
+  responses:
+    InternalError:
+      description: Erro interno do servidor
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error:
+              code: "INTERNAL_ERROR"
+              message: "Unexpected error"
