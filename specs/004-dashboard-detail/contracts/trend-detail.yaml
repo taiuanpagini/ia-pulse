@@ -1,0 +1,183 @@
+openapi: "3.1.0"
+info:
+  title: IAPulse — Trend Detail API
+  version: "1.0.0"
+  description: >
+    Endpoint para buscar o detalhe completo de uma tendência, incluindo score atual quando disponível.
+    O dashboard não possui endpoint dedicado — os dados são buscados diretamente via Mongoose
+    no Server Component, beneficiando-se do acesso server-side ao banco sem roundtrip HTTP.
+
+paths:
+  /api/trends/{id}:
+    get:
+      summary: Retorna o detalhe completo de uma tendência
+      description: >
+        Retorna todos os campos de uma tendência, incluindo score atual e metadados do tópico
+        (nome e cor) injetados via join na camada de serviço.
+        Usado pela página de detalhe /trends/[id] para atualização client-side após scoring (router.refresh).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID MongoDB da tendência (ObjectId de 24 chars hex)
+          example: "660d1a2b3c4e5f6a7b8c9d10"
+      responses:
+        "200":
+          description: Tendência encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrendDetailResponse"
+              examples:
+                scored:
+                  summary: Tendência avaliada
+                  value:
+                    data:
+                      id: "660d1a2b3c4e5f6a7b8c9d10"
+                      title: "FlashAttention-3: Fast and Accurate Attention"
+                      summary: "We present FlashAttention-3, a new version achieving 1.5-2x speedup on H100 GPUs by exploiting GEMM and softmax asynchrony."
+                      url: "https://arxiv.org/abs/2407.08608"
+                      source: "arXiv"
+                      topicSlug: "infraestrutura"
+                      topicName: "Infraestrutura"
+                      topicColor: "blue"
+                      collectedAt: "2026-03-25T07:00:00.000Z"
+                      score:
+                        maturity: 4
+                        applicability: 5
+                        competitiveImpact: 4
+                        strategicAlignment: 3
+                        adoptionComplexity: 2
+                        total: 4.15
+                        level: "alto"
+                        scoredBy: "manual"
+                        scoredAt: "2026-03-25T10:30:00.000Z"
+                        notes: "Impacto imediato para workloads de inference."
+                unscored:
+                  summary: Tendência não avaliada
+                  value:
+                    data:
+                      id: "660d1a2b3c4e5f6a7b8c9d11"
+                      title: "EU AI Act enters into force"
+                      summary: "The regulation lays down harmonised rules on artificial intelligence..."
+                      url: "https://eur-lex.europa.eu/..."
+                      source: "EUR-Lex AI Act"
+                      topicSlug: "regulamentacao"
+                      topicName: "Regulamentação"
+                      topicColor: "emerald"
+                      collectedAt: "2026-03-25T07:00:00.000Z"
+                      score: null
+        "404":
+          description: Tendência não encontrada ou ID inválido
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error:
+                  code: "TREND_NOT_FOUND"
+                  message: "Tendência não encontrada"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+components:
+  schemas:
+    ScoreLevel:
+      type: string
+      enum: [baixo, medio, alto, critico]
+      description: >
+        Faixas: baixo=1.00–2.49, medio=2.50–3.49, alto=3.50–4.49, critico=4.50–5.00
+
+    TrendDetailResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [id, title, summary, url, source, topicSlug, topicName, topicColor, collectedAt]
+          properties:
+            id:
+              type: string
+            title:
+              type: string
+            summary:
+              type: string
+              description: Resumo completo (sem truncamento na página de detalhe)
+            url:
+              type: string
+              format: uri
+              description: URL da fonte original — deve abrir em nova aba no frontend
+            source:
+              type: string
+            topicSlug:
+              type: string
+            topicName:
+              type: string
+            topicColor:
+              type: string
+              enum: [blue, emerald, violet, amber, rose, cyan, orange, teal, pink, indigo]
+            collectedAt:
+              type: string
+              format: date-time
+            score:
+              nullable: true
+              type: object
+              required: [maturity, applicability, competitiveImpact, strategicAlignment, adoptionComplexity, total, level, scoredBy, scoredAt]
+              properties:
+                maturity:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                applicability:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                competitiveImpact:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                strategicAlignment:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                adoptionComplexity:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                total:
+                  type: number
+                  minimum: 1.0
+                  maximum: 5.0
+                level:
+                  $ref: "#/components/schemas/ScoreLevel"
+                scoredBy:
+                  type: string
+                  enum: [manual, llm]
+                scoredAt:
+                  type: string
+                  format: date-time
+                notes:
+                  type: string
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+
+  responses:
+    InternalError:
+      description: Erro interno do servidor
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
