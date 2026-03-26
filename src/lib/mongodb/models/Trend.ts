@@ -21,6 +21,9 @@ export interface ITrend extends Document {
   collectedAt: Date;
   deletedAt?: Date;
   score?: IScore;
+  lang?: "pt" | "en";
+  titlePt?: string;
+  summaryPt?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -50,6 +53,9 @@ const TrendSchema = new Schema<ITrend>(
     collectedAt: { type: Date, required: true, default: Date.now },
     deletedAt: { type: Date },
     score: { type: ScoreSchema },
+    lang: { type: String, enum: ["pt", "en"] },
+    titlePt: { type: String },
+    summaryPt: { type: String },
   },
   { timestamps: true }
 );
@@ -59,6 +65,7 @@ TrendSchema.index({ topicSlug: 1, collectedAt: -1 });
 TrendSchema.index({ "score.total": -1 });
 TrendSchema.index({ source: 1 });
 TrendSchema.index({ collectedAt: -1 });
+TrendSchema.index({ title: "text", summary: "text", titlePt: "text", summaryPt: "text" });
 
 export const Trend: Model<ITrend> =
   mongoose.models.Trend ?? mongoose.model<ITrend>("Trend", TrendSchema);

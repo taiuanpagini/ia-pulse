@@ -4,13 +4,17 @@ import Typography from "@mui/material/Typography";
 import EmojiEventsOutlinedIcon from "@mui/icons-material/EmojiEventsOutlined";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import { TrendCard } from "./TrendCard";
+import { Pagination } from "./Pagination";
 import { ScoredTrendCard } from "@/lib/trends/service";
 
 interface RankedSectionProps {
   trends: ScoredTrendCard[];
+  total: number;
+  page: number;
+  limit: number;
 }
 
-export function RankedSection({ trends }: RankedSectionProps) {
+export function RankedSection({ trends, total, page, limit }: RankedSectionProps) {
   return (
     <Box>
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
@@ -42,13 +46,16 @@ export function RankedSection({ trends }: RankedSectionProps) {
           </Typography>
         </Box>
       ) : (
-        <Grid container spacing={2} alignItems="stretch">
-          {trends.map((t) => (
-            <Grid item xs={12} sm={6} md={4} key={t.id} sx={{ display: "flex" }}>
-              <TrendCard variant="scored" {...t} />
-            </Grid>
-          ))}
-        </Grid>
+        <>
+          <Grid container spacing={2} alignItems="stretch">
+            {trends.map((t) => (
+              <Grid item xs={12} sm={6} md={4} key={t.id} sx={{ display: "flex" }}>
+                <TrendCard variant="scored" {...t} />
+              </Grid>
+            ))}
+          </Grid>
+          <Pagination page={page} total={total} limit={limit} />
+        </>
       )}
     </Box>
   );

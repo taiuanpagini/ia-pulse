@@ -1,10 +1,16 @@
 import { CollectedItem, CollectorResult } from "../types";
 
 const ARXIV_BASE = "https://export.arxiv.org/api/query";
-const CATEGORIES = ["cs.LG", "cs.AR"];
-const MAX_RESULTS = 20;
-const TOPIC_SLUG = "infraestrutura";
 const SOURCE = "arXiv";
+
+// Queries mistas por categoria + termos aplicados — reduz papers puramente teóricos
+const QUERIES: { query: string; topicSlug: string }[] = [
+  { query: "cat:cs.LG AND (ti:quantization OR ti:deployment OR ti:inference)", topicSlug: "infraestrutura" },
+  { query: "cat:cs.AR AND (ti:GPU OR ti:TPU OR ti:neural)", topicSlug: "infraestrutura" },
+  { query: "cat:cs.LG AND (ti:regulation OR ti:privacy OR ti:fairness)", topicSlug: "regulamentacao" },
+];
+
+const MAX_PER_QUERY = 8;
 
 function extractText(xml: string, tag: string): string {
   const match = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\/${tag}>`, "i").exec(xml);
@@ -21,12 +27,18 @@ function extractAll(xml: string, tag: string): string[] {
   return results;
 }
 
-export async function collectArxiv(signal?: AbortSignal): Promise<{ items: CollectedItem[]; result: CollectorResult }> {
+export async function collectArxiv(
+  signal?: AbortSignal
+): Promise<{ items: CollectedItem[]; result: CollectorResult }> {
+  const seen = new Set<string>();
   const items: CollectedItem[] = [];
-  let totalFetched = 0;
 
-  for (const category of CATEGORIES) {
-    const url = `${ARXIV_BASE}?search_query=cat:${category}&sortBy=submittedDate&sortOrder=descending&max_results=${MAX_RESULTS}`;
+  for (const { query, topicSlug } of QUERIES) {
+    const url =
+      `${ARXIV_BASE}?search_query=${encodeURIComponent(query)}` +
+      `&sortBy=submittedDate&sortOrder=descending` +
+      `&max_results=${MAX_PER_QUERY}`;
+
     const response = await fetch(url, { signal });
     if (!response.ok) throw new Error(`arXiv HTTP ${response.status}`);
 
@@ -39,27 +51,22 @@ export async function collectArxiv(signal?: AbortSignal): Promise<{ items: Colle
       const ids = extractAll(entry, "id");
       const id = ids[0] ?? "";
 
-      if (!title || !id) continue;
+      if (!title || !id || seen.has(id)) continue;
+      seen.add(id);
 
       items.push({
         title,
         summary,
         url: id,
         source: SOURCE,
-        topicSlug: TOPIC_SLUG,
+        topicSlug,
         collectedAt: new Date(),
       });
-      totalFetched++;
     }
   }
 
   return {
     items,
-    result: {
-      source: SOURCE,
-      status: "success",
-      itemsCollected: totalFetched,
-      itemsSkipped: 0,
-    },
+    result: { source: SOURCE, status: "success", itemsCollected: items.length, itemsSkipped: 0 },
   };
 }

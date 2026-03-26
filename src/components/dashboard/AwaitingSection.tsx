@@ -3,14 +3,18 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import PendingActionsOutlinedIcon from "@mui/icons-material/PendingActionsOutlined";
 import { TrendCard } from "./TrendCard";
+import { Pagination } from "./Pagination";
 import { UnscoredTrendCard } from "@/lib/trends/service";
 
 interface AwaitingSectionProps {
   trends: UnscoredTrendCard[];
+  total: number;
+  page: number;
+  limit: number;
 }
 
-export function AwaitingSection({ trends }: AwaitingSectionProps) {
-  if (trends.length === 0) return null;
+export function AwaitingSection({ trends, total, page, limit }: AwaitingSectionProps) {
+  if (trends.length === 0 && total === 0) return null;
 
   return (
     <Box>
@@ -29,6 +33,7 @@ export function AwaitingSection({ trends }: AwaitingSectionProps) {
           </Grid>
         ))}
       </Grid>
+      <Pagination page={page} total={total} limit={limit} />
     </Box>
   );
 }

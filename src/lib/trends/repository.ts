@@ -54,22 +54,54 @@ export async function listDistinctSources(): Promise<string[]> {
   return Trend.distinct("source", { deletedAt: null });
 }
 
-export async function getScoredTrends(topicSlug?: string | null, limit = 50) {
+function searchFilter(search?: string | null): FilterQuery<ITrend> {
+  if (!search || search.trim().length < 2) return {};
+  const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return { $or: [
+    { title: { $regex: escaped, $options: "i" } },
+    { titlePt: { $regex: escaped, $options: "i" } },
+    { summary: { $regex: escaped, $options: "i" } },
+  ]};
+}
+
+export async function getScoredTrends(
+  topicSlug?: string | null,
+  search?: string | null,
+  page = 1,
+  limit = 24
+) {
+  const skip = (page - 1) * limit;
   const filter: FilterQuery<ITrend> = {
     score: { $exists: true },
     deletedAt: null,
     ...(topicSlug ? { topicSlug } : {}),
+    ...searchFilter(search),
   };
-  return Trend.find(filter).sort({ "score.total": -1 }).limit(limit).lean();
+  const [items, total] = await Promise.all([
+    Trend.find(filter).sort({ "score.total": -1 }).skip(skip).limit(limit).lean(),
+    Trend.countDocuments(filter),
+  ]);
+  return { items, total };
 }
 
-export async function getUnscoredTrends(topicSlug?: string | null, limit = 50) {
+export async function getUnscoredTrends(
+  topicSlug?: string | null,
+  search?: string | null,
+  page = 1,
+  limit = 24
+) {
+  const skip = (page - 1) * limit;
   const filter: FilterQuery<ITrend> = {
     score: { $exists: false },
     deletedAt: null,
     ...(topicSlug ? { topicSlug } : {}),
+    ...searchFilter(search),
   };
-  return Trend.find(filter).sort({ collectedAt: -1 }).limit(limit).lean();
+  const [items, total] = await Promise.all([
+    Trend.find(filter).sort({ collectedAt: -1 }).skip(skip).limit(limit).lean(),
+    Trend.countDocuments(filter),
+  ]);
+  return { items, total };
 }
 
 export async function getTrendById(id: string) {

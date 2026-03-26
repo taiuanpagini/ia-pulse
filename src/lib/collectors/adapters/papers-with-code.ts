@@ -3,6 +3,7 @@ import { CollectedItem, CollectorResult } from "../types";
 const API_BASE = "https://paperswithcode.com/api/v1";
 const SOURCE = "Papers With Code";
 const TOPIC_SLUG = "infraestrutura";
+const ITEMS_PER_PAGE = 12;
 
 interface PWCPaper {
   id: string;
@@ -10,14 +11,18 @@ interface PWCPaper {
   abstract?: string;
   url_abs?: string;
   url_pdf?: string;
+  github_link?: string | null;
 }
 
 interface PWCResponse {
   results: PWCPaper[];
 }
 
-export async function collectPapersWithCode(signal?: AbortSignal): Promise<{ items: CollectedItem[]; result: CollectorResult }> {
-  const url = `${API_BASE}/papers/?ordering=-published&items_per_page=20`;
+export async function collectPapersWithCode(
+  signal?: AbortSignal
+): Promise<{ items: CollectedItem[]; result: CollectorResult }> {
+  // Ordena por github_link (papers com implementação real têm mais aplicabilidade)
+  const url = `${API_BASE}/papers/?ordering=-github_link&items_per_page=${ITEMS_PER_PAGE}`;
   const response = await fetch(url, { signal });
   if (!response.ok) throw new Error(`Papers With Code HTTP ${response.status}`);
 
@@ -41,11 +46,6 @@ export async function collectPapersWithCode(signal?: AbortSignal): Promise<{ ite
 
   return {
     items,
-    result: {
-      source: SOURCE,
-      status: "success",
-      itemsCollected: items.length,
-      itemsSkipped: 0,
-    },
+    result: { source: SOURCE, status: "success", itemsCollected: items.length, itemsSkipped: 0 },
   };
 }

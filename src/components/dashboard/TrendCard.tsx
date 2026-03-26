@@ -88,6 +88,13 @@ export function TrendCard(props: TrendCardProps) {
             <TopicBadge name={topicName} color={topicColor} />
             <Typography variant="caption" color="text.secondary">{source}</Typography>
             <Typography variant="caption" color="text.disabled">{formatDate(collectedAt)}</Typography>
+            {props.lang === "pt" || props.titlePt ? (
+              <Chip
+                label={props.lang === "pt" ? "PT-BR" : "Traduzido"}
+                size="small"
+                sx={{ bgcolor: "#dcfce7", color: "#166534", fontSize: "0.65rem", height: 18, "& .MuiChip-label": { px: 0.75 } }}
+              />
+            ) : null}
           </Stack>
         </CardContent>
       </CardActionArea>

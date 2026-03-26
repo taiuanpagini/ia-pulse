@@ -75,11 +75,13 @@ export async function listSources(): Promise<string[]> {
 export interface ScoredTrendCard {
   id: string;
   title: string;
+  titlePt?: string;
   source: string;
   topicSlug: string;
   topicName: string;
   topicColor: string;
   collectedAt: string;
+  lang?: string;
   score: {
     total: number;
     level: ScoreLevel;
@@ -90,11 +92,13 @@ export interface ScoredTrendCard {
 export interface UnscoredTrendCard {
   id: string;
   title: string;
+  titlePt?: string;
   source: string;
   topicSlug: string;
   topicName: string;
   topicColor: string;
   collectedAt: string;
+  lang?: string;
 }
 
 export interface TrendScoreDetail {
@@ -123,17 +127,28 @@ export interface TrendDetail {
   score?: TrendScoreDetail;
 }
 
-export async function getDashboardData(topicFilter?: string | null): Promise<{
+export interface DashboardData {
   scored: ScoredTrendCard[];
   unscored: UnscoredTrendCard[];
-}> {
+  scoredTotal: number;
+  unscoredTotal: number;
+}
+
+export async function getDashboardData(
+  topicFilter?: string | null,
+  search?: string | null,
+  page = 1
+): Promise<DashboardData> {
   await connectDB();
 
-  const [scoredRaw, unscoredRaw, topics] = await Promise.all([
-    getScoredTrends(topicFilter),
-    getUnscoredTrends(topicFilter),
+  const [scoredResult, unscoredResult, topics] = await Promise.all([
+    getScoredTrends(topicFilter, search, page),
+    getUnscoredTrends(topicFilter, search, page),
     findAllTopics(),
   ]);
+
+  const scoredRaw = scoredResult.items;
+  const unscoredRaw = unscoredResult.items;
 
   const topicMap = new Map<string, ITopic>(topics.map((t) => [t.slug, t]));
 
@@ -150,6 +165,8 @@ export async function getDashboardData(topicFilter?: string | null): Promise<{
       return {
         id: String(t._id),
         title: t.title,
+        titlePt: t.titlePt,
+        lang: t.lang,
         source: t.source,
         topicSlug: t.topicSlug,
         topicName: topic?.name ?? t.topicSlug,
@@ -168,6 +185,8 @@ export async function getDashboardData(topicFilter?: string | null): Promise<{
     return {
       id: String(t._id),
       title: t.title,
+      titlePt: t.titlePt,
+      lang: t.lang,
       source: t.source,
       topicSlug: t.topicSlug,
       topicName: topic?.name ?? t.topicSlug,
@@ -176,7 +195,7 @@ export async function getDashboardData(topicFilter?: string | null): Promise<{
     };
   });
 
-  return { scored, unscored };
+  return { scored, unscored, scoredTotal: scoredResult.total, unscoredTotal: unscoredResult.total };
 }
 
 export async function getTrendDetail(id: string): Promise<TrendDetail | null> {

@@ -21,7 +21,9 @@ export async function collectRssFeed(
   const feedData = await parser.parseURL(feed.url);
   const items: CollectedItem[] = [];
 
-  for (const entry of feedData.items ?? []) {
+  const MAX_ITEMS = feed.maxItems ?? 6;
+
+  for (const entry of (feedData.items ?? []).slice(0, MAX_ITEMS)) {
     const url = entry.link ?? entry.guid;
     const title = entry.title;
 

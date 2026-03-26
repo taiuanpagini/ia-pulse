@@ -2,6 +2,8 @@ export interface RssFeedConfig {
   url: string;
   source: string;
   topicSlug: string;
+  maxItems?: number; // default: 6
+  lang?: "pt" | "en";
 }
 
 export const RSS_FEEDS: RssFeedConfig[] = [
@@ -52,25 +54,52 @@ export const RSS_FEEDS: RssFeedConfig[] = [
     source: "Stanford HAI",
     topicSlug: "regulamentacao",
   },
-  // Geral
+  // Geral — Internacional
   {
     url: "https://www.deeplearning.ai/the-batch/feed/",
     source: "The Batch",
     topicSlug: "geral",
+    maxItems: 5,
   },
   {
     url: "https://jack-clark.net/feed/",
     source: "Import AI",
     topicSlug: "geral",
+    maxItems: 4,
   },
   {
     url: "https://venturebeat.com/category/ai/feed/",
     source: "VentureBeat AI",
     topicSlug: "geral",
+    maxItems: 6,
   },
   {
     url: "https://www.technologyreview.com/topic/artificial-intelligence/feed",
     source: "MIT Technology Review AI",
     topicSlug: "geral",
+    maxItems: 5,
+  },
+
+  // Brasil — fontes em Português
+  {
+    url: "https://olhardigital.com.br/feed/",
+    source: "Olhar Digital",
+    topicSlug: "geral",
+    maxItems: 5,
+    lang: "pt",
+  },
+  {
+    url: "https://canaltech.com.br/rss.xml",
+    source: "Canaltech",
+    topicSlug: "geral",
+    maxItems: 5,
+    lang: "pt",
+  },
+  {
+    url: "https://www.gov.br/mcti/pt-br/acompanhe-o-mcti/noticias/RSS",
+    source: "MCTI Brasil",
+    topicSlug: "regulamentacao",
+    maxItems: 4,
+    lang: "pt",
   },
 ];
