@@ -1,0 +1,110 @@
+openapi: "3.1.0"
+info:
+  title: IAPulse — Cron Collect Endpoint
+  version: "1.0.0"
+
+paths:
+  /api/cron/collect:
+    post:
+      summary: Aciona a coleta diária de tendências de todas as fontes configuradas
+      description: >
+        Endpoint acionado automaticamente pelo Vercel Cron (07:00 UTC).
+        Pode ser acionado manualmente por operador autorizado.
+        Protegido por CRON_SECRET no header Authorization.
+      security:
+        - cronSecret: []
+      responses:
+        "200":
+          description: Coleta concluída (com ou sem erros por fonte)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollectResponse"
+              example:
+                ok: true
+                collectedAt: "2026-03-25T07:00:00.000Z"
+                totalNewItems: 87
+                sources:
+                  - source: "arXiv"
+                    status: "success"
+                    itemsCollected: 18
+                  - source: "HackerNews"
+                    status: "success"
+                    itemsCollected: 12
+                  - source: "NVIDIA Developer Blog"
+                    status: "error"
+                    itemsCollected: 0
+                    error: "Connection timeout"
+        "401":
+          description: Credencial ausente ou inválida
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error:
+                  code: "UNAUTHORIZED"
+                  message: "Missing or invalid CRON_SECRET"
+        "500":
+          description: Erro crítico que impediu a execução (ex: falha de conexão com MongoDB)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  securitySchemes:
+    cronSecret:
+      type: http
+      scheme: bearer
+      description: >
+        Valor de CRON_SECRET configurado nas variáveis de ambiente Vercel.
+        O Vercel injeta automaticamente ao acionar o cron.
+
+  schemas:
+    CollectResponse:
+      type: object
+      required: [ok, collectedAt, totalNewItems, sources]
+      properties:
+        ok:
+          type: boolean
+        collectedAt:
+          type: string
+          format: date-time
+        totalNewItems:
+          type: integer
+          description: Total de itens novos inseridos (deduplicated)
+        sources:
+          type: array
+          items:
+            $ref: "#/components/schemas/SourceReport"
+
+    SourceReport:
+      type: object
+      required: [source, status, itemsCollected]
+      properties:
+        source:
+          type: string
+          example: "arXiv"
+        status:
+          type: string
+          enum: [success, error]
+        itemsCollected:
+          type: integer
+          minimum: 0
+        error:
+          type: string
+          description: Mensagem de erro (presente apenas quando status = error)
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+            message:
+              type: string

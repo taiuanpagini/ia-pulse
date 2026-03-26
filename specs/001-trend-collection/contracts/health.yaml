@@ -1,0 +1,52 @@
+openapi: "3.1.0"
+info:
+  title: IAPulse — Health Endpoint
+  version: "1.0.0"
+
+paths:
+  /api/health:
+    get:
+      summary: Verifica o status operacional do sistema e conectividade com MongoDB
+      description: >
+        Endpoint público de saúde. Retorna status do sistema e da conexão com o banco de dados.
+        Responde em menos de 2 segundos (NFR-005).
+      responses:
+        "200":
+          description: Sistema operacional e banco de dados acessível
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+              example:
+                status: "ok"
+                database: "connected"
+                timestamp: "2026-03-25T10:30:00.000Z"
+        "503":
+          description: Sistema operacional mas banco de dados inacessível
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+              example:
+                status: "degraded"
+                database: "disconnected"
+                timestamp: "2026-03-25T10:30:00.000Z"
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status, database, timestamp]
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded]
+          description: >
+            "ok" = tudo operacional;
+            "degraded" = sistema rodando mas com dependência indisponível
+        database:
+          type: string
+          enum: [connected, disconnected]
+        timestamp:
+          type: string
+          format: date-time
