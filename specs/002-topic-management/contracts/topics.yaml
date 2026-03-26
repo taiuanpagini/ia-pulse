@@ -1,0 +1,203 @@
+openapi: "3.1.0"
+info:
+  title: IAPulse — Topics API
+  version: "1.0.0"
+
+paths:
+  /api/topics:
+    get:
+      summary: Lista todos os tópicos cadastrados
+      description: Retorna todos os tópicos ordenados por nome. Usado para popular filtros da listagem e gestão de tópicos.
+      responses:
+        "200":
+          description: Lista de tópicos
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Topic"
+              example:
+                data:
+                  - id: "660d1a2b3c4e5f6a7b8c9d0e"
+                    name: "Infraestrutura"
+                    slug: "infraestrutura"
+                    description: "GPUs, TPUs, edge computing, quantização"
+                    color: "blue"
+                  - id: "660d1a2b3c4e5f6a7b8c9d0f"
+                    name: "Regulamentação"
+                    slug: "regulamentacao"
+                    description: "AI Act, ANPD, compliance"
+                    color: "emerald"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+    post:
+      summary: Cadastra novo tópico
+      description: Cria um novo tópico de monitoramento. O slug é gerado automaticamente a partir do nome se não for fornecido. A cor é atribuída automaticamente da paleta predefinida.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTopicInput"
+            example:
+              name: "Agentes Autônomos"
+              description: "LLM agents, AutoGPT, frameworks de orquestração"
+      responses:
+        "201":
+          description: Tópico criado
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Topic"
+        "409":
+          description: Slug já em uso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error:
+                  code: "SLUG_CONFLICT"
+                  message: "Já existe um tópico com o slug 'agentes-autonomos'"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/topics/{slug}:
+    patch:
+      summary: Atualiza a descrição de um tópico existente
+      description: Atualiza apenas a descrição do tópico. O slug é imutável e não pode ser alterado.
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "infraestrutura"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTopicInput"
+            example:
+              description: "GPUs, TPUs, edge computing, quantização de modelos e hardware especializado para IA"
+      responses:
+        "200":
+          description: Tópico atualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Topic"
+        "404":
+          description: Tópico não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error:
+                  code: "TOPIC_NOT_FOUND"
+                  message: "Tópico 'infraestrutura' não encontrado"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+components:
+  schemas:
+    Topic:
+      type: object
+      required: [id, name, slug, description, color]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          example: "Infraestrutura"
+        slug:
+          type: string
+          example: "infraestrutura"
+          description: Imutável após criação
+        description:
+          type: string
+          example: "GPUs, TPUs, edge computing, quantização"
+        color:
+          type: string
+          enum: [blue, emerald, violet, amber, rose, cyan, orange, teal, pink, indigo]
+          description: Cor atribuída automaticamente; usada para renderizar tags consistentemente
+
+    CreateTopicInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 60
+        slug:
+          type: string
+          pattern: "^[a-z0-9-]+$"
+          description: Opcional — gerado automaticamente a partir do nome se ausente
+        description:
+          type: string
+          maxLength: 500
+          default: ""
+
+    UpdateTopicInput:
+      type: object
+      required: [description]
+      properties:
+        description:
+          type: string
+          maxLength: 500
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+
+  responses:
+    ValidationError:
+      description: Input inválido
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error:
+              code: "VALIDATION_ERROR"
+              message: "name: String must contain at least 2 character(s)"
+    InternalError:
+      description: Erro interno do servidor
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error:
+              code: "INTERNAL_ERROR"
+              message: "Unexpected error"
