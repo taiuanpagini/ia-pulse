@@ -1,0 +1,76 @@
+export interface RssFeedConfig {
+  url: string;
+  source: string;
+  topicSlug: string;
+}
+
+export const RSS_FEEDS: RssFeedConfig[] = [
+  // Infraestrutura
+  {
+    url: "https://developer.nvidia.com/blog/feed",
+    source: "NVIDIA Developer Blog",
+    topicSlug: "infraestrutura",
+  },
+  {
+    url: "https://huggingface.co/blog/feed.xml",
+    source: "Hugging Face Blog",
+    topicSlug: "infraestrutura",
+  },
+  {
+    url: "https://ai.googleblog.com/feeds/posts/default",
+    source: "Google AI Blog",
+    topicSlug: "infraestrutura",
+  },
+  // Regulamentação
+  {
+    url: "https://eur-lex.europa.eu/RSSFUL.do?ihmlang=en&mtype=1&type=&sector=&domain=IA&DTS_DOM=AI",
+    source: "EUR-Lex AI Act",
+    topicSlug: "regulamentacao",
+  },
+  {
+    url: "https://www.gov.br/anpd/pt-br/assuntos/noticias/RSS",
+    source: "ANPD",
+    topicSlug: "regulamentacao",
+  },
+  {
+    url: "https://www.nist.gov/artificial-intelligence/rss.xml",
+    source: "NIST AI RMF",
+    topicSlug: "regulamentacao",
+  },
+  {
+    url: "https://futureoflife.org/feed/",
+    source: "Future of Life Institute",
+    topicSlug: "regulamentacao",
+  },
+  {
+    url: "https://ainowinstitute.org/feed",
+    source: "AI Now Institute",
+    topicSlug: "regulamentacao",
+  },
+  {
+    url: "https://hai.stanford.edu/news/rss.xml",
+    source: "Stanford HAI",
+    topicSlug: "regulamentacao",
+  },
+  // Geral
+  {
+    url: "https://www.deeplearning.ai/the-batch/feed/",
+    source: "The Batch",
+    topicSlug: "geral",
+  },
+  {
+    url: "https://jack-clark.net/feed/",
+    source: "Import AI",
+    topicSlug: "geral",
+  },
+  {
+    url: "https://venturebeat.com/category/ai/feed/",
+    source: "VentureBeat AI",
+    topicSlug: "geral",
+  },
+  {
+    url: "https://www.technologyreview.com/topic/artificial-intelligence/feed",
+    source: "MIT Technology Review AI",
+    topicSlug: "geral",
+  },
+];
