@@ -14,8 +14,7 @@ type TrendCardProps =
   | ({ variant: "scored" } & ScoredTrendCard)
   | ({ variant: "unscored" } & UnscoredTrendCard);
 
-const CARD_HEIGHT = 172;
-const TITLE_LINES = 2;
+const TITLE_LINES = 3;
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("pt-BR", {
@@ -32,7 +31,6 @@ export function TrendCard(props: TrendCardProps) {
     <Card
       sx={{
         width: "100%",
-        height: CARD_HEIGHT,
         display: "flex",
         flexDirection: "column",
         transition: "box-shadow 0.15s, border-color 0.15s",
@@ -42,19 +40,18 @@ export function TrendCard(props: TrendCardProps) {
       <CardActionArea
         component={NextLink}
         href={`/trends/${id}`}
-        sx={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "stretch" }}
+        sx={{ flexGrow: 1, display: "flex", flexDirection: "column", alignItems: "stretch" }}
       >
         <CardContent
           sx={{
-            height: "100%",
+            flexGrow: 1,
             display: "flex",
             flexDirection: "column",
-            p: 2,
+            gap: 1.5,
             pb: "16px !important",
           }}
         >
-          {/* Score badge — topo direito */}
-          <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1, mb: 1 }}>
+          <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1 }}>
             <Typography
               variant="body2"
               fontWeight={600}
@@ -87,7 +84,6 @@ export function TrendCard(props: TrendCardProps) {
             )}
           </Box>
 
-          {/* Metadados — sempre no rodapé */}
           <Stack direction="row" spacing={0.75} flexWrap="wrap" alignItems="center" mt="auto">
             <TopicBadge name={topicName} color={topicColor} />
             <Typography variant="caption" color="text.secondary" noWrap>{source}</Typography>

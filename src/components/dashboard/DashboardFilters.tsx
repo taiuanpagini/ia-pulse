@@ -65,7 +65,7 @@ export function DashboardFilters({
       sx={{
         border: "1px solid",
         borderColor: "divider",
-        borderRadius: 3,
+        borderRadius: "10px",
         overflow: "hidden",
       }}
     >
