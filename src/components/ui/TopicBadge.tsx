@@ -1,16 +1,17 @@
 import Chip from "@mui/material/Chip";
 
+// Cores alinhadas com a paleta Amazing onde possível
 const colorMap: Record<string, { bg: string; color: string }> = {
-  blue:    { bg: "#eff6ff", color: "#1d4ed8" },
-  emerald: { bg: "#ecfdf5", color: "#065f46" },
-  violet:  { bg: "#f5f3ff", color: "#5b21b6" },
-  amber:   { bg: "#fffbeb", color: "#92400e" },
-  rose:    { bg: "#fff1f2", color: "#9f1239" },
-  cyan:    { bg: "#ecfeff", color: "#0e7490" },
-  orange:  { bg: "#fff7ed", color: "#9a3412" },
-  teal:    { bg: "#f0fdfa", color: "#0f766e" },
-  pink:    { bg: "#fdf2f8", color: "#9d174d" },
-  indigo:  { bg: "#eef2ff", color: "#3730a3" },
+  blue:    { bg: "#EFF6FF", color: "#1D4ED8" },
+  emerald: { bg: "#ECFDF5", color: "#065F46" },
+  violet:  { bg: "#F3E8FF", color: "#68009F" }, // brand purple
+  amber:   { bg: "#FFF9E0", color: "#92600A" }, // brand yellow tone
+  rose:    { bg: "#FFE4F0", color: "#D2006F" }, // brand pink
+  cyan:    { bg: "#ECFEFF", color: "#0E7490" },
+  orange:  { bg: "#FFF7ED", color: "#9A3412" },
+  teal:    { bg: "#F0FDFA", color: "#0F766E" },
+  pink:    { bg: "#FFE4F0", color: "#D2006F" }, // brand pink
+  indigo:  { bg: "#F3E8FF", color: "#68009F" }, // brand purple
 };
 
 interface TopicBadgeProps {

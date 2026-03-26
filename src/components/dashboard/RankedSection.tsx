@@ -30,19 +30,8 @@ export function RankedSection({ trends, total, page, limit }: RankedSectionProps
           borderColor: "divider",
         }}
       >
-        <Box
-          sx={{
-            width: 32,
-            height: 32,
-            borderRadius: "10px",
-            bgcolor: "#eef2ff",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-          }}
-        >
-          <LeaderboardOutlinedIcon sx={{ color: "#4f46e5", fontSize: 18 }} />
+        <Box sx={{ width: 32, height: 32, borderRadius: "10px", bgcolor: "#FDC500", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <LeaderboardOutlinedIcon sx={{ color: "#121212", fontSize: 18 }} />
         </Box>
         <Box sx={{ flex: 1 }}>
           <Typography variant="h6" color="text.primary" sx={{ fontSize: "1rem", lineHeight: 1.2 }}>
@@ -55,14 +44,7 @@ export function RankedSection({ trends, total, page, limit }: RankedSectionProps
         <Chip
           label={`${total.toLocaleString("pt-BR")} avaliadas`}
           size="small"
-          sx={{
-            bgcolor: "#eef2ff",
-            color: "#4338ca",
-            fontWeight: 700,
-            fontSize: "0.7rem",
-            height: 24,
-            "& .MuiChip-label": { px: 1.25 },
-          }}
+          sx={{ bgcolor: "#FFF9E0", color: "#92600A", fontWeight: 700, fontSize: "0.7rem", height: 24, "& .MuiChip-label": { px: 1.25 } }}
         />
       </Box>
 

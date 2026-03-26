@@ -38,12 +38,12 @@ export default async function TrendDetailPage({
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
 
-      {/* ── HERO HEADER ─────────────────────────────────────── */}
+      {/* ── HERO ─────────────────────────────────────────────── */}
       <Box
         sx={{
           position: "relative",
           overflow: "hidden",
-          background: "linear-gradient(160deg, #0f172a 0%, #1e1b4b 55%, #0f172a 100%)",
+          bgcolor: "#121212",
           pt: { xs: 3, sm: 4 },
           pb: { xs: 4, sm: 5 },
           "&::before": {
@@ -51,18 +51,16 @@ export default async function TrendDetailPage({
             position: "absolute",
             inset: 0,
             backgroundImage:
-              "radial-gradient(ellipse at 70% 40%, rgba(99,102,241,0.20) 0%, transparent 60%), " +
-              "radial-gradient(ellipse at 20% 80%, rgba(6,182,212,0.08) 0%, transparent 50%)",
+              "radial-gradient(ellipse at 70% 40%, rgba(253,197,0,0.16) 0%, transparent 55%), " +
+              "radial-gradient(ellipse at 15% 80%, rgba(104,0,159,0.10) 0%, transparent 50%)",
             pointerEvents: "none",
           },
           "&::after": {
             content: '""',
             position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
+            bottom: 0, left: 0, right: 0,
             height: "1px",
-            background: "linear-gradient(90deg, transparent, rgba(99,102,241,0.4), transparent)",
+            background: "linear-gradient(90deg, transparent, rgba(253,197,0,0.35), transparent)",
           },
         }}
       >
@@ -75,28 +73,18 @@ export default async function TrendDetailPage({
                 <Box
                   sx={{
                     width: 36, height: 36, borderRadius: "10px",
-                    background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
+                    bgcolor: "#FDC500",
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    boxShadow: "0 0 0 1px rgba(255,255,255,0.1) inset, 0 0 20px rgba(99,102,241,0.4)",
+                    boxShadow: "0 0 18px rgba(253,197,0,0.35)",
                     flexShrink: 0,
                   }}
                 >
-                  <GraphicEqIcon sx={{ color: "white", fontSize: 20 }} />
+                  <GraphicEqIcon sx={{ color: "#121212", fontSize: 20 }} />
                 </Box>
                 <Typography
-                  sx={{
-                    color: "#fff", fontWeight: 800,
-                    fontSize: "1.25rem",
-                    letterSpacing: "-0.03em", lineHeight: 1.1,
-                  }}
+                  sx={{ color: "#FAFAFA", fontWeight: 800, fontSize: "1.25rem", letterSpacing: "-0.03em", lineHeight: 1.1 }}
                 >
-                  IA
-                  <Box component="span" sx={{
-                    background: "linear-gradient(90deg, #818cf8, #67e8f9)",
-                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-                  }}>
-                    Pulse
-                  </Box>
+                  IA<Box component="span" sx={{ color: "#FDC500" }}>Pulse</Box>
                 </Typography>
               </Stack>
 
@@ -106,17 +94,17 @@ export default async function TrendDetailPage({
                 underline="none"
                 sx={{
                   display: "inline-flex", alignItems: "center", gap: 0.5,
-                  color: "rgba(255,255,255,0.5)",
+                  color: "rgba(250,250,250,0.5)",
                   fontSize: "0.8rem", fontWeight: 500,
                   px: 1.5, py: 0.75,
                   borderRadius: "8px",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  bgcolor: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(250,250,250,0.12)",
+                  bgcolor: "rgba(250,250,250,0.05)",
                   transition: "all 0.15s",
                   "&:hover": {
-                    color: "rgba(255,255,255,0.85)",
-                    bgcolor: "rgba(255,255,255,0.1)",
-                    borderColor: "rgba(255,255,255,0.2)",
+                    color: "#FDC500",
+                    bgcolor: "rgba(253,197,0,0.08)",
+                    borderColor: "rgba(253,197,0,0.3)",
                   },
                 }}
               >
@@ -125,25 +113,18 @@ export default async function TrendDetailPage({
               </MuiLink>
             </Stack>
 
-            {/* Título + badges */}
+            {/* Badges + título + meta */}
             <Box>
               <Stack direction="row" spacing={1} alignItems="center" mb={1.5} flexWrap="wrap" useFlexGap>
                 <TopicBadge name={trend.topicName} color={trend.topicColor} />
                 {trend.score && <ScoreBadge total={trend.score.total} />}
                 {trend.score && (
-                  <Typography
-                    sx={{
-                      color: "rgba(255,255,255,0.5)",
-                      fontSize: "0.75rem",
-                      fontFamily: "monospace",
-                      fontWeight: 700,
-                    }}
-                  >
+                  <Typography sx={{ color: "rgba(250,250,250,0.5)", fontSize: "0.75rem", fontFamily: "monospace", fontWeight: 700 }}>
                     {trend.score.total.toFixed(2)}
                   </Typography>
                 )}
                 {!trend.score && (
-                  <Typography sx={{ color: "rgba(255,255,255,0.35)", fontSize: "0.72rem" }}>
+                  <Typography sx={{ color: "rgba(250,250,250,0.35)", fontSize: "0.72rem" }}>
                     Aguardando avaliação
                   </Typography>
                 )}
@@ -151,33 +132,29 @@ export default async function TrendDetailPage({
 
               <Typography
                 sx={{
-                  color: "#fff",
-                  fontWeight: 700,
+                  color: "#FAFAFA", fontWeight: 700,
                   fontSize: { xs: "1.1rem", sm: "1.3rem" },
-                  letterSpacing: "-0.02em",
-                  lineHeight: 1.4,
+                  letterSpacing: "-0.02em", lineHeight: 1.4,
                   display: "-webkit-box",
-                  WebkitLineClamp: 3,
-                  WebkitBoxOrient: "vertical",
-                  overflow: "hidden",
+                  WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden",
                 }}
               >
                 {displayTitle}
               </Typography>
 
               <Stack direction="row" spacing={1.5} alignItems="center" mt={1.25} flexWrap="wrap" useFlexGap>
-                <Typography sx={{ color: "rgba(255,255,255,0.4)", fontSize: "0.72rem" }}>
+                <Typography sx={{ color: "rgba(250,250,250,0.4)", fontSize: "0.72rem" }}>
                   {trend.source}
                 </Typography>
-                <Box sx={{ width: 3, height: 3, borderRadius: "50%", bgcolor: "rgba(255,255,255,0.2)", flexShrink: 0 }} />
-                <Typography sx={{ color: "rgba(255,255,255,0.4)", fontSize: "0.72rem" }}>
+                <Box sx={{ width: 3, height: 3, borderRadius: "50%", bgcolor: "rgba(250,250,250,0.2)", flexShrink: 0 }} />
+                <Typography sx={{ color: "rgba(250,250,250,0.4)", fontSize: "0.72rem" }}>
                   {trend.publishedAt
                     ? `Publicado em ${new Date(trend.publishedAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}`
                     : `Coletado em ${new Date(trend.collectedAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}`}
                 </Typography>
                 {trend.lang === "pt" && (
-                  <Box sx={{ px: 0.75, py: 0.1, borderRadius: "4px", bgcolor: "rgba(52,211,153,0.15)", border: "1px solid rgba(52,211,153,0.3)" }}>
-                    <Typography sx={{ color: "#34d399", fontSize: "0.65rem", fontWeight: 700 }}>PT-BR</Typography>
+                  <Box sx={{ px: 0.75, py: 0.1, borderRadius: "4px", bgcolor: "rgba(253,197,0,0.15)", border: "1px solid rgba(253,197,0,0.3)" }}>
+                    <Typography sx={{ color: "#FDC500", fontSize: "0.65rem", fontWeight: 700 }}>PT-BR</Typography>
                   </Box>
                 )}
               </Stack>

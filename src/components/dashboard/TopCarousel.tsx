@@ -11,19 +11,30 @@ import { getScoreLevel } from "@/lib/scoring/levels";
 import type { ScoredTrendCard } from "@/lib/trends/service";
 
 const topicBorderColor: Record<string, string> = {
-  blue: "#3b82f6", emerald: "#10b981", violet: "#7c3aed", amber: "#f59e0b",
-  rose: "#f43f5e", cyan: "#06b6d4", orange: "#f97316", teal: "#14b8a6",
-  pink: "#ec4899", indigo: "#6366f1",
+  blue:    "#2563EB",
+  emerald: "#059669",
+  violet:  "#68009F",
+  amber:   "#FDC500",
+  rose:    "#D2006F",
+  cyan:    "#0891B2",
+  orange:  "#EA580C",
+  teal:    "#0F766E",
+  pink:    "#D2006F",
+  indigo:  "#68009F",
 };
 
 const scoreTextColor: Record<string, string> = {
-  low: "#94a3b8", medium: "#d97706", high: "#059669", critical: "#4338ca",
+  low:      "#9CA3AF",
+  medium:   "#D2006F",
+  high:     "#68009F",
+  critical: "#92600A",
 };
 
+// Medalhas com amarelo brand no 1º lugar
 const MEDAL: Record<number, { label: string; color: string; bg: string }> = {
-  1: { label: "1º", color: "#b45309", bg: "#fef3c7" },
-  2: { label: "2º", color: "#64748b", bg: "#f1f5f9" },
-  3: { label: "3º", color: "#92400e", bg: "#ffedd5" },
+  1: { label: "1º", color: "#92600A", bg: "#FDC500" },
+  2: { label: "2º", color: "#4A006F", bg: "#E9D5FF" },
+  3: { label: "3º", color: "#9F0050", bg: "#FFE4F0" },
 };
 
 function formatDate(iso: string) {
@@ -68,12 +79,7 @@ function CarouselCard({ trend, rank }: CarouselCardProps) {
         <CardContent sx={{ flexGrow: 1, p: 2, pb: "16px !important", display: "flex", flexDirection: "column", gap: 1.25 }}>
           {/* Rank + score */}
           <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Box
-              sx={{
-                px: 1, py: 0.25, borderRadius: "6px",
-                bgcolor: medal.bg, display: "inline-flex", alignItems: "center",
-              }}
-            >
+            <Box sx={{ px: 1, py: 0.25, borderRadius: "6px", bgcolor: medal.bg, display: "inline-flex", alignItems: "center" }}>
               <Typography sx={{ color: medal.color, fontWeight: 800, fontSize: "0.8rem" }}>
                 {medal.label}
               </Typography>
@@ -134,14 +140,8 @@ export function TopCarousel({ trends }: TopCarouselProps) {
   return (
     <Box>
       <Stack direction="row" alignItems="center" spacing={1} mb={2}>
-        <Box
-          sx={{
-            px: 1.25, py: 0.5, borderRadius: "8px",
-            background: "linear-gradient(135deg, #f59e0b, #d97706)",
-            display: "inline-flex", alignItems: "center",
-          }}
-        >
-          <Typography sx={{ color: "#fff", fontWeight: 800, fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+      <Box sx={{ px: 1.25, py: 0.5, borderRadius: "8px", bgcolor: "#FDC500", display: "inline-flex", alignItems: "center" }}>
+          <Typography sx={{ color: "#121212", fontWeight: 800, fontSize: "0.75rem", letterSpacing: "0.05em" }}>
             TOP {trends.length}
           </Typography>
         </Box>

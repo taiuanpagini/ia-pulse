@@ -1,16 +1,31 @@
 "use client";
 import { createTheme } from "@mui/material/styles";
 
+// Amazing brand palette
+const YELLOW  = "#FDC500";
+const BLACK   = "#121212";
+const WHITE   = "#FAFAFA";
+const PURPLE  = "#68009F";
+const PINK    = "#D2006F";
+
 const theme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#4f46e5",
-      light: "#6366f1",
-      dark: "#3730a3",
+      main: YELLOW,
+      light: "#FDD633",
+      dark: "#E6B200",
+      contrastText: BLACK,
     },
     secondary: {
-      main: "#06b6d4",
+      main: PURPLE,
+      light: "#8B00D4",
+      dark: "#4A006F",
+      contrastText: WHITE,
+    },
+    error: {
+      main: PINK,
+      contrastText: WHITE,
     },
     success: {
       main: "#059669",
@@ -21,15 +36,15 @@ const theme = createTheme({
       light: "#fffbeb",
     },
     background: {
-      default: "#f1f5f9",
-      paper: "#ffffff",
+      default: WHITE,
+      paper: "#FFFFFF",
     },
     text: {
-      primary: "#0f172a",
-      secondary: "#475569",
-      disabled: "#94a3b8",
+      primary: BLACK,
+      secondary: "#4B5563",
+      disabled: "#9CA3AF",
     },
-    divider: "#e2e8f0",
+    divider: "#E5E7EB",
   },
   typography: {
     fontFamily: [
@@ -46,15 +61,13 @@ const theme = createTheme({
     body1: { lineHeight: 1.65 },
     body2: { lineHeight: 1.6 },
   },
-  shape: {
-    borderRadius: 12,
-  },
+  shape: { borderRadius: 12 },
   components: {
     MuiCard: {
       styleOverrides: {
         root: {
           boxShadow: "0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04)",
-          border: "1px solid #e2e8f0",
+          border: "1px solid #E5E7EB",
         },
       },
     },
@@ -62,9 +75,13 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           textTransform: "none",
-          fontWeight: 600,
+          fontWeight: 700,
           borderRadius: 8,
           letterSpacing: 0,
+        },
+        containedPrimary: {
+          color: BLACK,
+          "&:hover": { backgroundColor: "#E6B200" },
         },
       },
     },
@@ -94,17 +111,26 @@ const theme = createTheme({
         },
       },
     },
-    MuiTableCell: {
+    MuiTabs: {
       styleOverrides: {
-        root: {
-          borderColor: "#f1f5f9",
+        indicator: {
+          backgroundColor: YELLOW,
         },
       },
     },
-    MuiInputBase: {
+    MuiTableCell: {
+      styleOverrides: {
+        root: { borderColor: "#F3F4F6" },
+      },
+    },
+    MuiToggleButton: {
       styleOverrides: {
         root: {
-          fontSize: "0.875rem",
+          "&.Mui-selected": {
+            backgroundColor: YELLOW,
+            color: BLACK,
+            "&:hover": { backgroundColor: "#E6B200" },
+          },
         },
       },
     },

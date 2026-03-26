@@ -57,21 +57,12 @@ function StatPill({ icon, label, value, color, bg, border }: StatPillProps) {
         bgcolor: bg,
         border: "1px solid",
         borderColor: border,
-        backdropFilter: "blur(8px)",
       }}
     >
       <Box sx={{ color, display: "flex", alignItems: "center", "& svg": { fontSize: 15 } }}>
         {icon}
       </Box>
-      <Typography
-        sx={{
-          color,
-          fontWeight: 800,
-          fontSize: "0.95rem",
-          fontVariantNumeric: "tabular-nums",
-          lineHeight: 1,
-        }}
-      >
+      <Typography sx={{ color, fontWeight: 800, fontSize: "0.95rem", fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>
         {value.toLocaleString("pt-BR")}
       </Typography>
       <Typography sx={{ color: "rgba(255,255,255,0.45)", fontSize: "0.72rem", lineHeight: 1 }}>
@@ -89,38 +80,33 @@ export default async function Home({
   const { tab: tabParam, month: monthParam, topic, q, page: pageStr } = await searchParams;
 
   const tab = tabParam === "approved" || tabParam === "discarded" || tabParam === "awaiting"
-    ? tabParam
-    : "ranking";
+    ? tabParam : "ranking";
   const month = monthParam ?? currentPeriod();
   const page = Math.max(1, parseInt(pageStr ?? "1", 10) || 1);
 
-  const [topics, counts] = await Promise.all([
-    listTopics(),
-    fetchTabCounts(month, topic ?? null),
-  ]);
+  const [topics, counts] = await Promise.all([listTopics(), fetchTabCounts(month, topic ?? null)]);
 
-  // Fetch data for active tab
   let rankingCarousel: Awaited<ReturnType<typeof getRankingData>>["carousel"] = [];
-  let rankingTrends: Awaited<ReturnType<typeof getRankingData>>["trends"] = [];
+  let rankingTrends:   Awaited<ReturnType<typeof getRankingData>>["trends"]   = [];
   let rankingTotal = 0;
   let statusTrends: Awaited<ReturnType<typeof getStatusTabData>>["trends"] = [];
-  let statusTotal = 0;
+  let statusTotal  = 0;
   let awaitingTrends: Awaited<ReturnType<typeof getAwaitingData>>["trends"] = [];
-  let awaitingTotal = 0;
+  let awaitingTotal  = 0;
 
   if (tab === "ranking") {
     const data = await getRankingData(month, topic ?? null, q ?? null, page);
     rankingCarousel = data.carousel;
-    rankingTrends = data.trends;
-    rankingTotal = data.total;
+    rankingTrends   = data.trends;
+    rankingTotal    = data.total;
   } else if (tab === "approved" || tab === "discarded") {
     const data = await getStatusTabData(tab, topic ?? null, q ?? null, page);
     statusTrends = data.trends;
-    statusTotal = data.total;
+    statusTotal  = data.total;
   } else {
     const data = await getAwaitingData(topic ?? null, q ?? null, page);
     awaitingTrends = data.trends;
-    awaitingTotal = data.total;
+    awaitingTotal  = data.total;
   }
 
   const totalAll = counts.ranking + counts.approved + counts.discarded + counts.awaiting;
@@ -133,7 +119,7 @@ export default async function Home({
         sx={{
           position: "relative",
           overflow: "hidden",
-          background: "linear-gradient(160deg, #0f172a 0%, #1e1b4b 55%, #0f172a 100%)",
+          bgcolor: "#121212",
           pt: { xs: 4, sm: 5 },
           pb: { xs: 5, sm: 6 },
           "&::before": {
@@ -141,62 +127,57 @@ export default async function Home({
             position: "absolute",
             inset: 0,
             backgroundImage:
-              "radial-gradient(ellipse at 70% 40%, rgba(99,102,241,0.22) 0%, transparent 60%), " +
-              "radial-gradient(ellipse at 20% 80%, rgba(6,182,212,0.10) 0%, transparent 50%)",
+              "radial-gradient(ellipse at 65% 40%, rgba(253,197,0,0.18) 0%, transparent 55%), " +
+              "radial-gradient(ellipse at 20% 80%, rgba(104,0,159,0.12) 0%, transparent 50%)",
             pointerEvents: "none",
           },
           "&::after": {
             content: '""',
             position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
+            bottom: 0, left: 0, right: 0,
             height: "1px",
-            background: "linear-gradient(90deg, transparent, rgba(99,102,241,0.4), transparent)",
+            background: "linear-gradient(90deg, transparent, rgba(253,197,0,0.35), transparent)",
           },
         }}
       >
         <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
           <Stack spacing={3.5}>
+
+            {/* Logo */}
             <Stack direction="row" alignItems="center" spacing={1.75}>
               <Box
                 sx={{
                   width: 44, height: 44, borderRadius: "14px",
-                  background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
+                  bgcolor: "#FDC500",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  boxShadow: "0 0 0 1px rgba(255,255,255,0.1) inset, 0 0 24px rgba(99,102,241,0.5)",
+                  boxShadow: "0 0 24px rgba(253,197,0,0.4)",
                   flexShrink: 0,
                 }}
               >
-                <GraphicEqIcon sx={{ color: "white", fontSize: 24 }} />
+                <GraphicEqIcon sx={{ color: "#121212", fontSize: 24 }} />
               </Box>
               <Box>
                 <Typography
                   sx={{
-                    color: "#fff", fontWeight: 800,
+                    color: "#FAFAFA", fontWeight: 800,
                     fontSize: { xs: "1.4rem", sm: "1.6rem" },
                     letterSpacing: "-0.04em", lineHeight: 1.1,
                   }}
                 >
-                  IA
-                  <Box component="span" sx={{
-                    background: "linear-gradient(90deg, #818cf8, #67e8f9)",
-                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-                  }}>
-                    Pulse
-                  </Box>
+                  IA<Box component="span" sx={{ color: "#FDC500" }}>Pulse</Box>
                 </Typography>
-                <Typography sx={{ color: "rgba(255,255,255,0.4)", fontSize: "0.72rem", letterSpacing: "0.08em", textTransform: "uppercase", mt: 0.25 }}>
+                <Typography sx={{ color: "rgba(250,250,250,0.4)", fontSize: "0.72rem", letterSpacing: "0.08em", textTransform: "uppercase", mt: 0.25 }}>
                   Monitoramento de tendências em Inteligência Artificial
                 </Typography>
               </Box>
             </Stack>
 
+            {/* Stats */}
             <Stack direction="row" spacing={1.25} flexWrap="wrap" useFlexGap>
-              <StatPill icon={<TrendingUpIcon />} label="tendências" value={totalAll} color="#818cf8" bg="rgba(99,102,241,0.12)" border="rgba(99,102,241,0.25)" />
-              <StatPill icon={<CheckCircleOutlineIcon />} label="avaliadas" value={counts.ranking + counts.approved + counts.discarded} color="#34d399" bg="rgba(52,211,153,0.12)" border="rgba(52,211,153,0.25)" />
-              <StatPill icon={<HourglassEmptyIcon />} label="aguardando" value={counts.awaiting} color="#fbbf24" bg="rgba(251,191,36,0.12)" border="rgba(251,191,36,0.25)" />
-              <StatPill icon={<CategoryOutlinedIcon />} label="tópicos" value={topics.length} color="#67e8f9" bg="rgba(103,232,249,0.12)" border="rgba(103,232,249,0.25)" />
+              <StatPill icon={<TrendingUpIcon />}         label="tendências" value={totalAll}          color="#FDC500" bg="rgba(253,197,0,0.12)"    border="rgba(253,197,0,0.25)"    />
+              <StatPill icon={<CheckCircleOutlineIcon />} label="avaliadas"  value={counts.ranking + counts.approved + counts.discarded} color="#C084FC" bg="rgba(192,132,252,0.12)" border="rgba(192,132,252,0.25)" />
+              <StatPill icon={<HourglassEmptyIcon />}     label="aguardando" value={counts.awaiting}   color="#F472B6" bg="rgba(244,114,182,0.12)"  border="rgba(244,114,182,0.25)"  />
+              <StatPill icon={<CategoryOutlinedIcon />}   label="tópicos"    value={topics.length}     color="rgba(250,250,250,0.7)" bg="rgba(250,250,250,0.07)" border="rgba(250,250,250,0.12)" />
             </Stack>
           </Stack>
         </Container>
@@ -205,48 +186,27 @@ export default async function Home({
       {/* ── CONTEÚDO ─────────────────────────────────────────── */}
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Stack spacing={3}>
-
-          {/* Filters */}
           <Suspense fallback={null}>
-            <DashboardFilters
-              topics={topics}
-              active={topic}
-              totalScored={counts.ranking + counts.approved + counts.discarded}
-              totalUnscored={counts.awaiting}
-              search={q}
-            />
+            <DashboardFilters topics={topics} active={topic} totalScored={counts.ranking + counts.approved + counts.discarded} totalUnscored={counts.awaiting} search={q} />
           </Suspense>
 
-          {/* Tabs */}
           <Suspense fallback={null}>
             <DashboardTabs activeTab={tab} counts={counts} />
           </Suspense>
 
-          {/* Period selector — only ranking tab */}
           {tab === "ranking" && (
             <Suspense fallback={null}>
               <PeriodSelector activePeriod={month} />
             </Suspense>
           )}
 
-          {/* Tab content */}
           {tab === "ranking" && (
             rankingTotal === 0 ? (
-              <DashboardEmptyState
-                message="Nenhuma tendência avaliada neste período."
-                sub="Tente selecionar outro mês ou avalie tendências na aba Aguardando."
-              />
+              <DashboardEmptyState message="Nenhuma tendência avaliada neste período." sub="Tente selecionar outro mês ou avalie tendências na aba Aguardando." />
             ) : (
               <Stack spacing={4}>
-                {rankingCarousel.length > 0 && (
-                  <TopCarousel trends={rankingCarousel} />
-                )}
-                <RankedSection
-                  trends={rankingTrends}
-                  total={rankingTotal}
-                  page={page}
-                  limit={PAGE_LIMIT}
-                />
+                {rankingCarousel.length > 0 && <TopCarousel trends={rankingCarousel} />}
+                <RankedSection trends={rankingTrends} total={rankingTotal} page={page} limit={PAGE_LIMIT} />
               </Stack>
             )
           )}
@@ -258,25 +218,13 @@ export default async function Home({
                 sub="Abra uma tendência avaliada e use os botões de status para classificar."
               />
             ) : (
-              <StatusSection
-                trends={statusTrends}
-                total={statusTotal}
-                page={page}
-                limit={PAGE_LIMIT}
-                status={tab}
-              />
+              <StatusSection trends={statusTrends} total={statusTotal} page={page} limit={PAGE_LIMIT} status={tab} />
             )
           )}
 
           {tab === "awaiting" && (
-            <AwaitingSection
-              trends={awaitingTrends}
-              total={awaitingTotal}
-              page={page}
-              limit={PAGE_LIMIT}
-            />
+            <AwaitingSection trends={awaitingTrends} total={awaitingTotal} page={page} limit={PAGE_LIMIT} />
           )}
-
         </Stack>
       </Container>
     </Box>

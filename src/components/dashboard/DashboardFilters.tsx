@@ -159,21 +159,21 @@ export function DashboardFilters({
             label="Todos"
             size="small"
             onClick={() => selectTopic()}
-            sx={{
-              fontWeight: 700,
-              fontSize: "0.72rem",
-              cursor: "pointer",
-              height: 26,
-              bgcolor: !active ? "#4f46e5" : "transparent",
-              color: !active ? "#fff" : "text.secondary",
-              border: "1px solid",
-              borderColor: !active ? "#4f46e5" : "divider",
-              "& .MuiChip-label": { px: 1.25 },
-              "&:hover": {
-                bgcolor: !active ? "#3730a3" : "#f1f5f9",
-              },
-              transition: "all 0.15s",
-            }}
+              sx={{
+                fontWeight: 700,
+                fontSize: "0.72rem",
+                cursor: "pointer",
+                height: 26,
+                bgcolor: !active ? "#FDC500" : "transparent",
+                color: !active ? "#121212" : "text.secondary",
+                border: "1px solid",
+                borderColor: !active ? "#FDC500" : "divider",
+                "& .MuiChip-label": { px: 1.25 },
+                "&:hover": {
+                  bgcolor: !active ? "#E6B200" : "#F9FAFB",
+                },
+                transition: "all 0.15s",
+              }}
           />
 
           {topics.map((t) => {
@@ -205,13 +205,13 @@ export function DashboardFilters({
                   fontSize: "0.72rem",
                   cursor: "pointer",
                   height: 26,
-                  bgcolor: isActive ? "#4f46e5" : "transparent",
-                  color: isActive ? "#fff" : "text.secondary",
+                  bgcolor: isActive ? "#FDC500" : "transparent",
+                  color: isActive ? "#121212" : "text.secondary",
                   border: "1px solid",
-                  borderColor: isActive ? "#4f46e5" : "divider",
+                  borderColor: isActive ? "#FDC500" : "divider",
                   "& .MuiChip-label": { px: 1.25 },
                   "&:hover": {
-                    bgcolor: isActive ? "#3730a3" : "#f1f5f9",
+                    bgcolor: isActive ? "#E6B200" : "#F9FAFB",
                   },
                   transition: "all 0.15s",
                 }}

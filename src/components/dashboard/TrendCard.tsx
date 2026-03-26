@@ -15,47 +15,38 @@ type TrendCardProps =
   | ({ variant: "scored" } & ScoredTrendCard)
   | ({ variant: "unscored" } & UnscoredTrendCard);
 
-// Maps topic color key → vibrant accent for left border
 const topicBorderColor: Record<string, string> = {
-  blue:    "#3b82f6",
-  emerald: "#10b981",
-  violet:  "#7c3aed",
-  amber:   "#f59e0b",
-  rose:    "#f43f5e",
-  cyan:    "#06b6d4",
-  orange:  "#f97316",
-  teal:    "#14b8a6",
-  pink:    "#ec4899",
-  indigo:  "#6366f1",
+  blue:    "#2563EB",
+  emerald: "#059669",
+  violet:  "#68009F", // brand purple
+  amber:   "#FDC500", // brand yellow
+  rose:    "#D2006F", // brand pink
+  cyan:    "#0891B2",
+  orange:  "#EA580C",
+  teal:    "#0F766E",
+  pink:    "#D2006F", // brand pink
+  indigo:  "#68009F", // brand purple
 };
 
-// Score number color per level
 const scoreTextColor: Record<string, string> = {
-  low:      "#94a3b8",
-  medium:   "#d97706",
-  high:     "#059669",
-  critical: "#4338ca",
+  low:      "#9CA3AF",
+  medium:   "#D2006F", // brand pink
+  high:     "#68009F", // brand purple
+  critical: "#92600A", // dark gold (yellow on white = poor contrast)
 };
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
+  return new Date(iso).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
 }
 
 export function TrendCard(props: TrendCardProps) {
   const { variant, id, title, source, topicName, topicColor, collectedAt, publishedAt } = props;
 
   const displayTitle = ("titlePt" in props && props.titlePt) ? props.titlePt : title;
-  const displayDate = publishedAt ? formatDate(publishedAt) : formatDate(collectedAt);
-  const accentColor = topicBorderColor[topicColor] ?? "#6366f1";
+  const displayDate  = publishedAt ? formatDate(publishedAt) : formatDate(collectedAt);
+  const accentColor  = topicBorderColor[topicColor] ?? "#FDC500";
 
-  const scoreLevel =
-    variant === "scored"
-      ? getScoreLevel(props.score.total).level
-      : null;
+  const scoreLevel = variant === "scored" ? getScoreLevel(props.score.total).level : null;
 
   return (
     <Card
@@ -65,9 +56,10 @@ export function TrendCard(props: TrendCardProps) {
         flexDirection: "column",
         borderLeft: "3px solid",
         borderLeftColor: accentColor,
+        bgcolor: "#FFFFFF",
         transition: "box-shadow 0.2s ease, transform 0.2s ease",
         "&:hover": {
-          boxShadow: "0 12px 32px -6px rgb(0 0 0 / 0.14), 0 4px 8px -2px rgb(0 0 0 / 0.06)",
+          boxShadow: "0 8px 24px -4px rgba(253,197,0,0.18), 0 2px 8px -2px rgb(0 0 0 / 0.08)",
           transform: "translateY(-2px)",
         },
       }}
@@ -77,25 +69,17 @@ export function TrendCard(props: TrendCardProps) {
         href={`/trends/${id}`}
         sx={{ flexGrow: 1, display: "flex", flexDirection: "column", alignItems: "stretch" }}
       >
-        <CardContent
-          sx={{
-            flexGrow: 1,
-            display: "flex",
-            flexDirection: "column",
-            p: 2.5,
-            pb: "20px !important",
-            gap: 1.5,
-          }}
-        >
-          {/* Header row: topic badge + score/pending */}
+        <CardContent sx={{ flexGrow: 1, display: "flex", flexDirection: "column", p: 2.5, pb: "20px !important", gap: 1.5 }}>
+
+          {/* Header: topic + status + score badge */}
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 1 }}>
             <TopicBadge name={topicName} color={topicColor} />
             <Stack direction="row" spacing={0.5} alignItems="center" flexShrink={0}>
               {variant === "scored" && props.status === "approved" && (
-                <Chip label="Aprovado" size="small" sx={{ bgcolor: "#ecfdf5", color: "#065f46", fontSize: "0.62rem", height: 18, "& .MuiChip-label": { px: 0.75 } }} />
+                <Chip label="Aprovado" size="small" sx={{ bgcolor: "#ECFDF5", color: "#065F46", fontSize: "0.62rem", height: 18, "& .MuiChip-label": { px: 0.75 } }} />
               )}
               {variant === "scored" && props.status === "discarded" && (
-                <Chip label="Descartado" size="small" sx={{ bgcolor: "#fef2f2", color: "#991b1b", fontSize: "0.62rem", height: 18, "& .MuiChip-label": { px: 0.75 } }} />
+                <Chip label="Descartado" size="small" sx={{ bgcolor: "#FFE4F0", color: "#D2006F", fontSize: "0.62rem", height: 18, "& .MuiChip-label": { px: 0.75 } }} />
               )}
               {variant === "scored" ? (
                 <ScoreBadge total={props.score.total} />
@@ -103,14 +87,7 @@ export function TrendCard(props: TrendCardProps) {
                 <Chip
                   label="Pendente"
                   size="small"
-                  sx={{
-                    bgcolor: "#f8fafc",
-                    color: "#94a3b8",
-                    fontSize: "0.65rem",
-                    height: 20,
-                    border: "1px dashed #cbd5e1",
-                    "& .MuiChip-label": { px: 0.75 },
-                  }}
+                  sx={{ bgcolor: "#F9FAFB", color: "#9CA3AF", fontSize: "0.65rem", height: 20, border: "1px dashed #D1D5DB", "& .MuiChip-label": { px: 0.75 } }}
                 />
               )}
             </Stack>
@@ -134,64 +111,23 @@ export function TrendCard(props: TrendCardProps) {
             {displayTitle}
           </Typography>
 
-          {/* Footer: source · date · score number · lang badge */}
-          <Stack
-            direction="row"
-            spacing={0.5}
-            alignItems="center"
-            mt="auto"
-            flexWrap="wrap"
-            useFlexGap
-            sx={{ gap: "4px 6px" }}
-          >
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              fontWeight={500}
-              noWrap
-              sx={{ fontSize: "0.72rem" }}
-            >
-              {source}
-            </Typography>
-
+          {/* Footer */}
+          <Stack direction="row" spacing={0.5} alignItems="center" mt="auto" flexWrap="wrap" useFlexGap sx={{ gap: "4px 6px" }}>
+            <Typography variant="caption" color="text.secondary" fontWeight={500} noWrap sx={{ fontSize: "0.72rem" }}>{source}</Typography>
             <Typography variant="caption" color="text.disabled" sx={{ fontSize: "0.72rem" }}>·</Typography>
-
-            <Typography
-              variant="caption"
-              color="text.disabled"
-              noWrap
-              sx={{ fontSize: "0.72rem" }}
-            >
-              {displayDate}
-            </Typography>
+            <Typography variant="caption" color="text.disabled" noWrap sx={{ fontSize: "0.72rem" }}>{displayDate}</Typography>
 
             {variant === "scored" && scoreLevel && (
               <>
                 <Typography variant="caption" color="text.disabled" sx={{ fontSize: "0.72rem" }}>·</Typography>
-                <Typography
-                  variant="caption"
-                  fontWeight={800}
-                  fontFamily="'JetBrains Mono', 'Fira Code', monospace"
-                  sx={{ color: scoreTextColor[scoreLevel], fontSize: "0.72rem" }}
-                  noWrap
-                >
+                <Typography variant="caption" fontWeight={800} fontFamily="monospace" sx={{ color: scoreTextColor[scoreLevel], fontSize: "0.72rem" }} noWrap>
                   {props.score.total.toFixed(2)}
                 </Typography>
               </>
             )}
 
             {(("lang" in props && props.lang === "pt") || ("titlePt" in props && props.titlePt)) && (
-              <Chip
-                label="PT"
-                size="small"
-                sx={{
-                  bgcolor: "#dcfce7",
-                  color: "#166534",
-                  fontSize: "0.6rem",
-                  height: 16,
-                  "& .MuiChip-label": { px: 0.5 },
-                }}
-              />
+              <Chip label="PT" size="small" sx={{ bgcolor: "#FFF9E0", color: "#92600A", fontSize: "0.6rem", height: 16, "& .MuiChip-label": { px: 0.5 } }} />
             )}
           </Stack>
         </CardContent>

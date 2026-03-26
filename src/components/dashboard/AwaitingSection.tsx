@@ -30,19 +30,8 @@ export function AwaitingSection({ trends, total, page, limit }: AwaitingSectionP
           borderColor: "divider",
         }}
       >
-        <Box
-          sx={{
-            width: 32,
-            height: 32,
-            borderRadius: "10px",
-            bgcolor: "#fffbeb",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-          }}
-        >
-          <PendingActionsOutlinedIcon sx={{ color: "#d97706", fontSize: 18 }} />
+        <Box sx={{ width: 32, height: 32, borderRadius: "10px", bgcolor: "#F3E8FF", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <PendingActionsOutlinedIcon sx={{ color: "#68009F", fontSize: 18 }} />
         </Box>
         <Box sx={{ flex: 1 }}>
           <Typography variant="h6" color="text.primary" sx={{ fontSize: "1rem", lineHeight: 1.2 }}>
@@ -55,14 +44,7 @@ export function AwaitingSection({ trends, total, page, limit }: AwaitingSectionP
         <Chip
           label={`${total.toLocaleString("pt-BR")} pendentes`}
           size="small"
-          sx={{
-            bgcolor: "#fffbeb",
-            color: "#b45309",
-            fontWeight: 700,
-            fontSize: "0.7rem",
-            height: 24,
-            "& .MuiChip-label": { px: 1.25 },
-          }}
+          sx={{ bgcolor: "#F3E8FF", color: "#4A006F", fontWeight: 700, fontSize: "0.7rem", height: 24, "& .MuiChip-label": { px: 1.25 } }}
         />
       </Box>
 

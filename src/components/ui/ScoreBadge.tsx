@@ -1,27 +1,12 @@
 import Chip from "@mui/material/Chip";
 import { getScoreLevel } from "@/lib/scoring/levels";
 
+// Crítico = maior score = destaque com amarelo brand
 const levelStyles: Record<string, { bg: string; color: string; dot: string }> = {
-  low: {
-    bg: "#f1f5f9",
-    color: "#475569",
-    dot: "#94a3b8",
-  },
-  medium: {
-    bg: "#fffbeb",
-    color: "#b45309",
-    dot: "#f59e0b",
-  },
-  high: {
-    bg: "#ecfdf5",
-    color: "#065f46",
-    dot: "#10b981",
-  },
-  critical: {
-    bg: "#eef2ff",
-    color: "#3730a3",
-    dot: "#6366f1",
-  },
+  low:      { bg: "#F3F4F6", color: "#6B7280", dot: "#9CA3AF" },
+  medium:   { bg: "#FFE4F0", color: "#D2006F", dot: "#D2006F" },
+  high:     { bg: "#F3E8FF", color: "#68009F", dot: "#68009F" },
+  critical: { bg: "#FFF9E0", color: "#92600A", dot: "#FDC500" },
 };
 
 interface ScoreBadgeProps {
@@ -36,16 +21,7 @@ export function ScoreBadge({ total }: ScoreBadgeProps) {
     <Chip
       label={
         <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          <span
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: "50%",
-              backgroundColor: s.dot,
-              display: "inline-block",
-              flexShrink: 0,
-            }}
-          />
+          <span style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: s.dot, display: "inline-block", flexShrink: 0 }} />
           {level.label}
         </span>
       }
