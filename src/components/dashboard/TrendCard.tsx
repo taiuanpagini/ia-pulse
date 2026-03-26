@@ -25,7 +25,7 @@ function formatDate(iso: string) {
 }
 
 export function TrendCard(props: TrendCardProps) {
-  const { variant, id, title, source, topicName, topicColor, collectedAt } = props;
+  const { variant, id, title, source, topicName, topicColor, collectedAt, publishedAt } = props;
 
   return (
     <Card
@@ -87,7 +87,9 @@ export function TrendCard(props: TrendCardProps) {
           <Stack direction="row" spacing={0.75} flexWrap="wrap" alignItems="center" mt="auto">
             <TopicBadge name={topicName} color={topicColor} />
             <Typography variant="caption" color="text.secondary" noWrap>{source}</Typography>
-            <Typography variant="caption" color="text.disabled" noWrap>{formatDate(collectedAt)}</Typography>
+            <Typography variant="caption" color="text.disabled" noWrap>
+              {publishedAt ? formatDate(publishedAt) : formatDate(collectedAt)}
+            </Typography>
             {(props.lang === "pt" || props.titlePt) && (
               <Chip
                 label={props.lang === "pt" ? "PT-BR" : "Traduzido"}

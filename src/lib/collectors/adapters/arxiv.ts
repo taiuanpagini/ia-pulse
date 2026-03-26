@@ -54,6 +54,9 @@ export async function collectArxiv(
       if (!title || !id || seen.has(id)) continue;
       seen.add(id);
 
+      const publishedRaw = extractText(entry, "published");
+      const publishedAt = publishedRaw ? new Date(publishedRaw) : undefined;
+
       items.push({
         title,
         summary,
@@ -61,6 +64,7 @@ export async function collectArxiv(
         source: SOURCE,
         topicSlug,
         collectedAt: new Date(),
+        publishedAt,
       });
     }
   }

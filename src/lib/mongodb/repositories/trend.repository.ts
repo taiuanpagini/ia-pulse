@@ -23,6 +23,7 @@ export async function upsertTrends(items: CollectedItem[]): Promise<UpsertResult
           source: item.source,
           topicSlug: item.topicSlug,
           collectedAt: item.collectedAt,
+          ...(item.publishedAt ? { publishedAt: item.publishedAt } : {}),
         },
       },
       { upsert: true }

@@ -23,6 +23,7 @@ interface RedditPost {
     is_self: boolean;
     score: number;
     link_flair_text?: string;
+    created_utc?: number;
   };
 }
 
@@ -52,10 +53,12 @@ export async function collectReddit(
       .slice(0, MAX_KEEP);
 
     for (const post of filtered) {
-      const { title, selftext, url: postUrl, permalink, is_self } = post.data;
+      const { title, selftext, url: postUrl, permalink, is_self, created_utc } = post.data;
       const finalUrl = is_self
         ? `https://reddit.com${permalink}`
         : (postUrl ?? `https://reddit.com${permalink}`);
+
+      const publishedAt = created_utc ? new Date(created_utc * 1000) : undefined;
 
       items.push({
         title,
@@ -64,6 +67,7 @@ export async function collectReddit(
         source: SOURCE,
         topicSlug: sub.topicSlug,
         collectedAt: new Date(),
+        publishedAt,
       });
     }
   }

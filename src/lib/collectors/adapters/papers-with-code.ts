@@ -12,6 +12,7 @@ interface PWCPaper {
   url_abs?: string;
   url_pdf?: string;
   github_link?: string | null;
+  published?: string;
 }
 
 interface PWCResponse {
@@ -34,6 +35,8 @@ export async function collectPapersWithCode(
     const title = paper.title ?? "";
     if (!title) continue;
 
+    const publishedAt = paper.published ? new Date(paper.published) : undefined;
+
     items.push({
       title,
       summary: (paper.abstract ?? "").slice(0, 500) || title,
@@ -41,6 +44,7 @@ export async function collectPapersWithCode(
       source: SOURCE,
       topicSlug: TOPIC_SLUG,
       collectedAt: new Date(),
+      publishedAt,
     });
   }
 

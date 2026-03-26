@@ -8,7 +8,7 @@ import { TrendDetail } from "@/lib/trends/service";
 
 type TrendDetailHeaderProps = Pick<
   TrendDetail,
-  "title" | "summary" | "url" | "source" | "topicName" | "topicColor" | "collectedAt"
+  "title" | "summary" | "url" | "source" | "topicName" | "topicColor" | "collectedAt" | "publishedAt"
 >;
 
 function formatDate(iso: string) {
@@ -27,6 +27,7 @@ export function TrendDetailHeader({
   topicName,
   topicColor,
   collectedAt,
+  publishedAt,
 }: TrendDetailHeaderProps) {
   return (
     <Box>
@@ -41,7 +42,15 @@ export function TrendDetailHeader({
       <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap">
         <TopicBadge name={topicName} color={topicColor} />
         <Typography variant="caption" color="text.secondary">{source}</Typography>
-        <Typography variant="caption" color="text.disabled">{formatDate(collectedAt)}</Typography>
+        {publishedAt ? (
+          <Typography variant="caption" color="text.disabled">
+            Publicado em {formatDate(publishedAt)}
+          </Typography>
+        ) : (
+          <Typography variant="caption" color="text.disabled">
+            Coletado em {formatDate(collectedAt)}
+          </Typography>
+        )}
 
         {url ? (
           <Link

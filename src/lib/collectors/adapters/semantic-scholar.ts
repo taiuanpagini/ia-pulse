@@ -21,6 +21,7 @@ interface SSPaper {
   externalIds?: { ArXiv?: string };
   citationCount?: number;
   year?: number;
+  publicationDate?: string;
 }
 
 interface SSResponse {
@@ -37,7 +38,7 @@ export async function collectSemanticScholar(
     const url =
       `${API_BASE}/paper/search` +
       `?query=${encodeURIComponent(query)}` +
-      `&fields=title,abstract,externalIds,url,citationCount,year` +
+      `&fields=title,abstract,externalIds,url,citationCount,year,publicationDate` +
       `&limit=${LIMIT_PER_QUERY}`;
 
     const response = await fetch(url, { signal });
@@ -64,6 +65,12 @@ export async function collectSemanticScholar(
       const title = paper.title ?? "";
       if (!title) continue;
 
+      const publishedAt = paper.publicationDate
+        ? new Date(paper.publicationDate)
+        : paper.year
+        ? new Date(`${paper.year}-01-01`)
+        : undefined;
+
       items.push({
         title,
         summary: (paper.abstract ?? "").slice(0, 500) || title,
@@ -71,6 +78,7 @@ export async function collectSemanticScholar(
         source: SOURCE,
         topicSlug,
         collectedAt: new Date(),
+        publishedAt,
       });
     }
   }

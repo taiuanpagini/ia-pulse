@@ -81,6 +81,7 @@ export interface ScoredTrendCard {
   topicName: string;
   topicColor: string;
   collectedAt: string;
+  publishedAt?: string;
   lang?: string;
   score: {
     total: number;
@@ -98,6 +99,7 @@ export interface UnscoredTrendCard {
   topicName: string;
   topicColor: string;
   collectedAt: string;
+  publishedAt?: string;
   lang?: string;
 }
 
@@ -124,6 +126,7 @@ export interface TrendDetail {
   topicName: string;
   topicColor: string;
   collectedAt: string;
+  publishedAt?: string;
   score?: TrendScoreDetail;
 }
 
@@ -172,6 +175,7 @@ export async function getDashboardData(
         topicName: topic?.name ?? t.topicSlug,
         topicColor: topic?.color ?? "blue",
         collectedAt: isoDate(t.collectedAt),
+        publishedAt: t.publishedAt ? isoDate(t.publishedAt) : undefined,
         score: {
           total: t.score!.total,
           level: levelConfig.level,
@@ -192,6 +196,7 @@ export async function getDashboardData(
       topicName: topic?.name ?? t.topicSlug,
       topicColor: topic?.color ?? "blue",
       collectedAt: isoDate(t.collectedAt),
+      publishedAt: t.publishedAt ? isoDate(t.publishedAt) : undefined,
     };
   });
 
@@ -236,6 +241,7 @@ export async function getTrendDetail(id: string): Promise<TrendDetail | null> {
     topicName: topic?.name ?? trend.topicSlug,
     topicColor: topic?.color ?? "blue",
     collectedAt: isoDate(trend.collectedAt),
+    publishedAt: trend.publishedAt ? isoDate(trend.publishedAt) : undefined,
     score,
   };
 }

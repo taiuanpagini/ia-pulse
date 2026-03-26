@@ -19,6 +19,7 @@ export interface ITrend extends Document {
   source: string;
   topicSlug: string;
   collectedAt: Date;
+  publishedAt?: Date;
   deletedAt?: Date;
   score?: IScore;
   lang?: "pt" | "en";
@@ -51,6 +52,7 @@ const TrendSchema = new Schema<ITrend>(
     source: { type: String, required: true },
     topicSlug: { type: String, required: true },
     collectedAt: { type: Date, required: true, default: Date.now },
+    publishedAt: { type: Date },
     deletedAt: { type: Date },
     score: { type: ScoreSchema },
     lang: { type: String, enum: ["pt", "en"] },

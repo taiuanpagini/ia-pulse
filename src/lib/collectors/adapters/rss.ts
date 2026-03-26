@@ -39,6 +39,8 @@ export async function collectRssFeed(
       .trim()
       .slice(0, 500);
 
+    const publishedAt = entry.isoDate ? new Date(entry.isoDate) : undefined;
+
     items.push({
       title: title.trim(),
       summary: summary || title.trim(),
@@ -46,6 +48,7 @@ export async function collectRssFeed(
       source: feed.source,
       topicSlug: feed.topicSlug,
       collectedAt: new Date(),
+      publishedAt,
     });
   }
 

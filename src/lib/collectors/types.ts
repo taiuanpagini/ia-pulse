@@ -5,6 +5,7 @@ export interface CollectedItem {
   source: string;
   topicSlug: string;
   collectedAt: Date;
+  publishedAt?: Date;
 }
 
 export type CollectorStatus = "success" | "partial" | "error";

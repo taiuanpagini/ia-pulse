@@ -20,6 +20,7 @@ interface HNHit {
   url?: string;
   story_url?: string;
   points?: number;
+  created_at?: string;
 }
 
 export async function collectHackerNews(
@@ -52,6 +53,8 @@ export async function collectHackerNews(
 
       const summary = (hit.story_text ?? hit.comment_text ?? "").slice(0, 500);
 
+      const publishedAt = hit.created_at ? new Date(hit.created_at) : undefined;
+
       items.push({
         title,
         summary: summary || title,
@@ -59,6 +62,7 @@ export async function collectHackerNews(
         source: SOURCE,
         topicSlug: TOPIC_SLUG,
         collectedAt: new Date(),
+        publishedAt,
       });
     }
   }

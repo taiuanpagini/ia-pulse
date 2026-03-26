@@ -102,6 +102,7 @@ export function TrendDetailClient({ trend, defaultValues }: TrendDetailClientPro
           topicName={trend.topicName}
           topicColor={trend.topicColor}
           collectedAt={trend.collectedAt}
+          publishedAt={trend.publishedAt}
         />
 
         {trend.score && (
