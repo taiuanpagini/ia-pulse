@@ -12,6 +12,7 @@ import Typography from "@mui/material/Typography";
 import Alert from "@mui/material/Alert";
 import Paper from "@mui/material/Paper";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
+import CircularProgress from "@mui/material/CircularProgress";
 import { ScoreFormSchema, ScoreFormValues, LLMScoreResponse } from "@/lib/scoring/schemas";
 import { calculateScore } from "@/lib/scoring/formula";
 import { determineScoredBy } from "@/lib/scoring/origin";
@@ -152,7 +153,7 @@ export function ScoreForm({ trendId, defaultValues, showAutoScore = false, onSuc
           type="submit"
           variant="contained"
           disabled={totalScore === null || isSaving}
-          startIcon={<SaveOutlinedIcon />}
+          startIcon={isSaving ? <CircularProgress size={16} sx={{ color: "inherit" }} /> : <SaveOutlinedIcon />}
           size="large"
           fullWidth
         >
