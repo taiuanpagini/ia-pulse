@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 import MuiLink from "@mui/material/Link";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
