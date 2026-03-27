@@ -113,6 +113,7 @@ export async function getCarouselTrends(
 }
 
 // ── status tabs (approved / discarded) ────────────────────────
+// Inclui tendências com e sem score — a única condição é o status
 
 export async function getTrendsByStatus(
   status: "approved" | "discarded",
@@ -123,20 +124,21 @@ export async function getTrendsByStatus(
 ) {
   const skip = (page - 1) * limit;
   const filter: FilterQuery<ITrend> = {
-    score: { $exists: true },
     status,
     deletedAt: null,
     ...(topicSlug ? { topicSlug } : {}),
     ...searchFilter(search),
   };
   const [items, total] = await Promise.all([
-    Trend.find(filter).sort({ "score.total": -1 }).skip(skip).limit(limit).lean(),
+    // Scored first (desc by score), then unscored by date
+    Trend.find(filter).sort({ "score.total": -1, collectedAt: -1 }).skip(skip).limit(limit).lean(),
     Trend.countDocuments(filter),
   ]);
   return { items, total };
 }
 
 // ── unscored (awaiting) ────────────────────────────────────────
+// Exclui itens que já foram aprovados ou descartados sem avaliação
 
 export async function getUnscoredTrends(
   topicSlug?: string | null,
@@ -147,6 +149,7 @@ export async function getUnscoredTrends(
   const skip = (page - 1) * limit;
   const filter: FilterQuery<ITrend> = {
     score: { $exists: false },
+    status: { $nin: ["approved", "discarded"] },
     deletedAt: null,
     ...(topicSlug ? { topicSlug } : {}),
     ...searchFilter(search),
@@ -173,9 +176,9 @@ export async function getTabCounts(
       ...monthFilter(month),
       ...topicFilter,
     }),
-    Trend.countDocuments({ score: { $exists: true }, status: "approved", deletedAt: null, ...topicFilter }),
-    Trend.countDocuments({ score: { $exists: true }, status: "discarded", deletedAt: null, ...topicFilter }),
-    Trend.countDocuments({ score: { $exists: false }, deletedAt: null, ...topicFilter }),
+    Trend.countDocuments({ status: "approved", deletedAt: null, ...topicFilter }),
+    Trend.countDocuments({ status: "discarded", deletedAt: null, ...topicFilter }),
+    Trend.countDocuments({ score: { $exists: false }, status: { $nin: ["approved", "discarded"] }, deletedAt: null, ...topicFilter }),
   ]);
   return { ranking, approved, discarded, awaiting };
 }

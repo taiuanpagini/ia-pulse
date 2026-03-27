@@ -220,16 +220,16 @@ export async function getStatusTabData(
   topicSlug?: string | null,
   search?: string | null,
   page = 1
-): Promise<{ trends: ScoredTrendCard[]; total: number }> {
+): Promise<{ trends: (ScoredTrendCard | UnscoredTrendCard)[]; total: number }> {
   await connectDB();
   const [result, topics] = await Promise.all([
     getTrendsByStatus(status, topicSlug, search, page),
     findAllTopics(),
   ]);
   const topicMap = new Map<string, ITopic>(topics.map((t) => [t.slug, t]));
-  const trends = (result.items as Array<ITrend & { _id: unknown }>)
-    .filter((t) => t.score != null)
-    .map((t) => toScoredCard(t, topicMap));
+  const trends = (result.items as Array<ITrend & { _id: unknown }>).map((t) =>
+    t.score != null ? toScoredCard(t, topicMap) : toUnscoredCard(t, topicMap)
+  );
   return { trends, total: result.total };
 }
 

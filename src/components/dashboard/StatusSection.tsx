@@ -5,10 +5,10 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import { TrendCard } from "./TrendCard";
 import { Pagination } from "./Pagination";
-import type { ScoredTrendCard } from "@/lib/trends/service";
+import type { ScoredTrendCard, UnscoredTrendCard } from "@/lib/trends/service";
 
 interface StatusSectionProps {
-  trends: ScoredTrendCard[];
+  trends: (ScoredTrendCard | UnscoredTrendCard)[];
   total: number;
   page: number;
   limit: number;
@@ -25,12 +25,12 @@ const CONFIG = {
     iconBg: "#ecfdf5",
   },
   discarded: {
-    icon: <CancelOutlinedIcon sx={{ fontSize: 18, color: "#dc2626" }} />,
+    icon: <CancelOutlinedIcon sx={{ fontSize: 18, color: "#D2006F" }} />,
     label: "Descartados",
     sub: "Tendências descartadas da análise",
-    chipBg: "#fef2f2",
-    chipColor: "#991b1b",
-    iconBg: "#fef2f2",
+    chipBg: "#FFE4F0",
+    chipColor: "#9F0050",
+    iconBg: "#FFE4F0",
   },
 };
 
@@ -55,9 +55,11 @@ export function StatusSection({ trends, total, page, limit, status }: StatusSect
       </Box>
 
       <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 2 }}>
-        {trends.map((t) => (
-          <TrendCard key={t.id} variant="scored" {...t} />
-        ))}
+        {trends.map((t) =>
+          "score" in t && t.score != null
+            ? <TrendCard key={t.id} variant="scored" {...(t as ScoredTrendCard)} />
+            : <TrendCard key={t.id} variant="unscored" {...(t as UnscoredTrendCard)} />
+        )}
       </Box>
       <Pagination page={page} total={total} limit={limit} />
     </Box>
