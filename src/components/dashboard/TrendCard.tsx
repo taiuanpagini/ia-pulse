@@ -75,10 +75,10 @@ export function TrendCard(props: TrendCardProps) {
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 1 }}>
             <TopicBadge name={topicName} color={topicColor} />
             <Stack direction="row" spacing={0.5} alignItems="center" flexShrink={0}>
-              {variant === "scored" && props.status === "approved" && (
+              {props.status === "approved" && (
                 <Chip label="Aprovado" size="small" sx={{ bgcolor: "#ECFDF5", color: "#065F46", fontSize: "0.62rem", height: 18, "& .MuiChip-label": { px: 0.75 } }} />
               )}
-              {variant === "scored" && props.status === "discarded" && (
+              {props.status === "discarded" && (
                 <Chip label="Descartado" size="small" sx={{ bgcolor: "#FFE4F0", color: "#D2006F", fontSize: "0.62rem", height: 18, "& .MuiChip-label": { px: 0.75 } }} />
               )}
               {variant === "scored" ? (

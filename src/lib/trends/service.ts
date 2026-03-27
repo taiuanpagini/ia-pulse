@@ -63,6 +63,7 @@ export interface UnscoredTrendCard {
   collectedAt: string;
   publishedAt?: string;
   lang?: string;
+  status?: TrendStatus;
 }
 
 export interface TrendScoreDetail {
@@ -141,6 +142,7 @@ function toUnscoredCard(t: ITrend & { _id: unknown }, topicMap: Map<string, ITop
     topicColor: topic?.color ?? "blue",
     collectedAt: isoDate(t.collectedAt),
     publishedAt: t.publishedAt ? isoDate(t.publishedAt) : undefined,
+    status: t.status,
   };
 }
 
