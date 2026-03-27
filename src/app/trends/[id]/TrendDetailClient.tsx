@@ -39,7 +39,7 @@ export function TrendDetailClient({ trend, defaultValues }: TrendDetailClientPro
     trend.titlePt ? { titlePt: trend.titlePt, summaryPt: trend.summaryPt ?? "" } : null
   );
   const [currentStatus, setCurrentStatus] = useState<TrendStatus | undefined>(trend.status);
-  const [statusLoading, setStatusLoading] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState<TrendStatus | null>(null);
   const [statusError, setStatusError] = useState<string | null>(null);
 
   const isAlreadyPt = trend.lang === "pt";
@@ -63,8 +63,8 @@ export function TrendDetailClient({ trend, defaultValues }: TrendDetailClientPro
   }
 
   async function handleStatusChange(newStatus: TrendStatus) {
-    if (newStatus === currentStatus) return;
-    setStatusLoading(true);
+    if (newStatus === currentStatus || loadingStatus !== null) return;
+    setLoadingStatus(newStatus);
     setStatusError(null);
     try {
       const res = await fetch(`/api/trends/${trend.id}/status`, {
@@ -79,7 +79,7 @@ export function TrendDetailClient({ trend, defaultValues }: TrendDetailClientPro
     } catch {
       setStatusError("Erro de conexão");
     } finally {
-      setStatusLoading(false);
+      setLoadingStatus(null);
     }
   }
 
@@ -160,16 +160,16 @@ export function TrendDetailClient({ trend, defaultValues }: TrendDetailClientPro
               const cfg = statusConfig[s];
               const isActive = (currentStatus ?? "pending") === s;
               return (
-                <Button
-                  key={s}
-                  size="small"
-                  variant={isActive ? "contained" : "outlined"}
-                  color={cfg.color}
-                  startIcon={statusLoading && isActive ? <CircularProgress size={12} /> : cfg.icon}
-                  onClick={() => handleStatusChange(s)}
-                  disabled={statusLoading}
-                  sx={{ fontWeight: isActive ? 700 : 500, minWidth: 120 }}
-                >
+                    <Button
+                      key={s}
+                      size="small"
+                      variant={isActive ? "contained" : "outlined"}
+                      color={cfg.color}
+                      startIcon={loadingStatus === s ? <CircularProgress size={12} /> : cfg.icon}
+                      onClick={() => handleStatusChange(s)}
+                      disabled={loadingStatus !== null}
+                      sx={{ fontWeight: isActive ? 700 : 500, minWidth: 120 }}
+                    >
                   {cfg.label}
                 </Button>
               );
