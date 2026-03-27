@@ -140,45 +140,42 @@ export function TrendDetailClient({ trend, defaultValues }: TrendDetailClientPro
           </Box>
         )}
 
-        {/* ── Status ── */}
-        {trend.score && (
-          <>
-            <Divider sx={{ my: 3 }} />
-            <Box>
-              <Typography variant="subtitle2" color="text.secondary" fontWeight={600} gutterBottom>
-                Status da tendência
-              </Typography>
-              <Typography variant="caption" color="text.disabled" display="block" mb={1.5}>
-                Classificar determina se este item aparece em Aprovados ou Descartados no dashboard.
-              </Typography>
+        {/* ── Status ── sempre visível ── */}
+        <Divider sx={{ my: 3 }} />
+        <Box>
+          <Typography variant="subtitle2" color="text.secondary" fontWeight={600} gutterBottom>
+            Status da tendência
+          </Typography>
+          <Typography variant="caption" color="text.disabled" display="block" mb={1.5}>
+            Classificar determina se este item aparece em Aprovados ou Descartados no dashboard.
+            {!trend.score && " Para Aprovado é recomendado avaliar antes."}
+          </Typography>
 
-              {statusError && (
-                <Alert severity="error" sx={{ mb: 1.5, py: 0.5, fontSize: "0.75rem" }}>{statusError}</Alert>
-              )}
+          {statusError && (
+            <Alert severity="error" sx={{ mb: 1.5, py: 0.5, fontSize: "0.75rem" }}>{statusError}</Alert>
+          )}
 
-              <Stack direction="row" spacing={1}>
-                {(["pending", "approved", "discarded"] as TrendStatus[]).map((s) => {
-                  const cfg = statusConfig[s];
-                  const isActive = (currentStatus ?? "pending") === s;
-                  return (
-                    <Button
-                      key={s}
-                      size="small"
-                      variant={isActive ? "contained" : "outlined"}
-                      color={cfg.color}
-                      startIcon={statusLoading && isActive ? <CircularProgress size={12} /> : cfg.icon}
-                      onClick={() => handleStatusChange(s)}
-                      disabled={statusLoading}
-                      sx={{ fontWeight: isActive ? 700 : 500, minWidth: 120 }}
-                    >
-                      {cfg.label}
-                    </Button>
-                  );
-                })}
-              </Stack>
-            </Box>
-          </>
-        )}
+          <Stack direction="row" spacing={1}>
+            {(["pending", "approved", "discarded"] as TrendStatus[]).map((s) => {
+              const cfg = statusConfig[s];
+              const isActive = (currentStatus ?? "pending") === s;
+              return (
+                <Button
+                  key={s}
+                  size="small"
+                  variant={isActive ? "contained" : "outlined"}
+                  color={cfg.color}
+                  startIcon={statusLoading && isActive ? <CircularProgress size={12} /> : cfg.icon}
+                  onClick={() => handleStatusChange(s)}
+                  disabled={statusLoading}
+                  sx={{ fontWeight: isActive ? 700 : 500, minWidth: 120 }}
+                >
+                  {cfg.label}
+                </Button>
+              );
+            })}
+          </Stack>
+        </Box>
       </Box>
 
       {/* ── Avaliação ── */}

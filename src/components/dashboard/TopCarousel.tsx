@@ -1,3 +1,6 @@
+"use client";
+
+import { useRef } from "react";
 import NextLink from "next/link";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -5,6 +8,9 @@ import CardActionArea from "@mui/material/CardActionArea";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
+import IconButton from "@mui/material/IconButton";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { TopicBadge } from "@/components/ui/TopicBadge";
 import { ScoreBadge } from "@/components/ui/ScoreBadge";
 import { getScoreLevel } from "@/lib/scoring/levels";
@@ -30,7 +36,6 @@ const scoreTextColor: Record<string, string> = {
   critical: "#92600A",
 };
 
-// Medalhas com amarelo brand no 1º lugar
 const MEDAL: Record<number, { label: string; color: string; bg: string }> = {
   1: { label: "1º", color: "#92600A", bg: "#FDC500" },
   2: { label: "2º", color: "#4A006F", bg: "#E9D5FF" },
@@ -47,9 +52,9 @@ interface CarouselCardProps {
 }
 
 function CarouselCard({ trend, rank }: CarouselCardProps) {
-  const medal = MEDAL[rank] ?? { label: `${rank}º`, color: "#4f46e5", bg: "#eef2ff" };
+  const medal = MEDAL[rank] ?? { label: `${rank}º`, color: "#4B5563", bg: "#F3F4F6" };
   const scoreLevel = getScoreLevel(trend.score.total).level;
-  const accentColor = topicBorderColor[trend.topicColor] ?? "#6366f1";
+  const accentColor = topicBorderColor[trend.topicColor] ?? "#FDC500";
   const displayTitle = trend.titlePt ?? trend.title;
   const displayDate = trend.publishedAt ? formatDate(trend.publishedAt) : formatDate(trend.collectedAt);
 
@@ -66,7 +71,7 @@ function CarouselCard({ trend, rank }: CarouselCardProps) {
         borderLeftColor: accentColor,
         transition: "box-shadow 0.2s, transform 0.2s",
         "&:hover": {
-          boxShadow: "0 12px 32px -6px rgb(0 0 0 / 0.16)",
+          boxShadow: "0 12px 32px -6px rgba(253,197,0,0.2)",
           transform: "translateY(-3px)",
         },
       }}
@@ -85,24 +90,15 @@ function CarouselCard({ trend, rank }: CarouselCardProps) {
               </Typography>
             </Box>
             <Stack direction="row" alignItems="center" spacing={0.75}>
-              <Typography
-                sx={{
-                  color: scoreTextColor[scoreLevel],
-                  fontWeight: 800,
-                  fontSize: "1rem",
-                  fontFamily: "monospace",
-                }}
-              >
+              <Typography sx={{ color: scoreTextColor[scoreLevel], fontWeight: 800, fontSize: "1rem", fontFamily: "monospace" }}>
                 {trend.score.total.toFixed(2)}
               </Typography>
               <ScoreBadge total={trend.score.total} />
             </Stack>
           </Stack>
 
-          {/* Topic */}
           <TopicBadge name={trend.topicName} color={trend.topicColor} />
 
-          {/* Title */}
           <Typography
             variant="body2"
             fontWeight={600}
@@ -120,7 +116,6 @@ function CarouselCard({ trend, rank }: CarouselCardProps) {
             {displayTitle}
           </Typography>
 
-          {/* Footer */}
           <Typography variant="caption" color="text.disabled" noWrap sx={{ fontSize: "0.7rem", mt: "auto" }}>
             {trend.source} · {displayDate}
           </Typography>
@@ -135,22 +130,65 @@ interface TopCarouselProps {
 }
 
 export function TopCarousel({ trends }: TopCarouselProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
   if (trends.length === 0) return null;
+
+  function scroll(direction: "left" | "right") {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: direction === "right" ? 280 : -280, behavior: "smooth" });
+  }
 
   return (
     <Box>
-      <Stack direction="row" alignItems="center" spacing={1} mb={2}>
-      <Box sx={{ px: 1.25, py: 0.5, borderRadius: "8px", bgcolor: "#FDC500", display: "inline-flex", alignItems: "center" }}>
-          <Typography sx={{ color: "#121212", fontWeight: 800, fontSize: "0.75rem", letterSpacing: "0.05em" }}>
-            TOP {trends.length}
+      {/* Header */}
+      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
+        <Stack direction="row" alignItems="center" spacing={1.25}>
+          <Box sx={{ px: 1.25, py: 0.5, borderRadius: "8px", bgcolor: "#FDC500", display: "inline-flex", alignItems: "center" }}>
+            <Typography sx={{ color: "#121212", fontWeight: 800, fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+              TOP {trends.length}
+            </Typography>
+          </Box>
+          <Typography variant="body2" color="text.secondary" fontWeight={500}>
+            Tendências mais pontuadas do período
           </Typography>
-        </Box>
-        <Typography variant="body2" color="text.secondary" fontWeight={500}>
-          Tendências mais pontuadas do período
-        </Typography>
+        </Stack>
+
+        {/* Navigation arrows */}
+        <Stack direction="row" spacing={0.5}>
+          <IconButton
+            size="small"
+            onClick={() => scroll("left")}
+            sx={{
+              bgcolor: "#F3F4F6",
+              border: "1px solid #E5E7EB",
+              width: 30, height: 30,
+              "&:hover": { bgcolor: "#FDC500", "& svg": { color: "#121212" } },
+              transition: "all 0.15s",
+            }}
+          >
+            <ChevronLeftIcon sx={{ fontSize: 18, color: "#6B7280" }} />
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={() => scroll("right")}
+            sx={{
+              bgcolor: "#F3F4F6",
+              border: "1px solid #E5E7EB",
+              width: 30, height: 30,
+              "&:hover": { bgcolor: "#FDC500", "& svg": { color: "#121212" } },
+              transition: "all 0.15s",
+            }}
+          >
+            <ChevronRightIcon sx={{ fontSize: 18, color: "#6B7280" }} />
+          </IconButton>
+        </Stack>
       </Stack>
 
+      {/* Scroll container */}
       <Box
+        ref={scrollRef}
         sx={{
           display: "flex",
           overflowX: "auto",
