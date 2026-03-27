@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
@@ -42,6 +42,11 @@ export function TrendDetailClient({ trend, defaultValues }: TrendDetailClientPro
   const [loadingStatus, setLoadingStatus] = useState<TrendStatus | null>(null);
   const [statusError, setStatusError] = useState<string | null>(null);
 
+  // Sincroniza estado local com atualização do servidor após router.refresh()
+  useEffect(() => {
+    setCurrentStatus(trend.status);
+  }, [trend.status]);
+
   const isAlreadyPt = trend.lang === "pt";
 
   async function handleTranslate() {
@@ -75,7 +80,7 @@ export function TrendDetailClient({ trend, defaultValues }: TrendDetailClientPro
       const body = (await res.json()) as { data?: { status: TrendStatus }; error?: { message: string } };
       if (!res.ok) { setStatusError(body.error?.message ?? "Erro ao atualizar status"); return; }
       setCurrentStatus(body.data?.status);
-      router.refresh();
+      router.refresh(); // invalida cache do router para a página anterior refletir a mudança
     } catch {
       setStatusError("Erro de conexão");
     } finally {

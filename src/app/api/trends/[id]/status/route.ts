@@ -29,8 +29,8 @@ export async function PATCH(
   await connectDB();
 
   const trend = await Trend.findOneAndUpdate(
-    { _id: id, deletedAt: null },
-    { status: parsed.data.status, statusAt: new Date() },
+    { _id: id },
+    { $set: { status: parsed.data.status, statusAt: new Date() } },
     { new: true }
   );
 
