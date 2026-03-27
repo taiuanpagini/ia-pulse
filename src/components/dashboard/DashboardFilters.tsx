@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter } from "nextjs-toploader/app";
 import { useSearchParams } from "next/navigation";
+import { useNavigation } from "@/contexts/NavigationContext";
 import { useEffect, useRef, useState } from "react";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
@@ -44,7 +44,7 @@ export function DashboardFilters({
   totalUnscored,
   search,
 }: DashboardFiltersProps) {
-  const router = useRouter();
+  const { navigate } = useNavigation();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(search ?? "");
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -59,7 +59,7 @@ export function DashboardFilters({
       } else {
         params.delete("q");
       }
-      router.push(`/?${params.toString()}`);
+      navigate(`/?${params.toString()}`);
     }, 350);
   }, [query]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -68,7 +68,7 @@ export function DashboardFilters({
     if (slug) params.set("topic", slug);
     else params.delete("topic");
     params.delete("page");
-    router.push(`/?${params.toString()}`);
+    navigate(`/?${params.toString()}`);
   }
 
   const total = totalScored + totalUnscored;

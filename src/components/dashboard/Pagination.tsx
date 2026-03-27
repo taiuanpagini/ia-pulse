@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter } from "nextjs-toploader/app";
 import { useSearchParams } from "next/navigation";
+import { useNavigation } from "@/contexts/NavigationContext";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
@@ -15,7 +15,7 @@ interface PaginationProps {
 }
 
 export function Pagination({ page, total, limit }: PaginationProps) {
-  const router = useRouter();
+  const { navigate: navTo } = useNavigation();
   const searchParams = useSearchParams();
   const totalPages = Math.ceil(total / limit);
 
@@ -24,7 +24,7 @@ export function Pagination({ page, total, limit }: PaginationProps) {
   function navigate(newPage: number) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", String(newPage));
-    router.push(`/?${params.toString()}`);
+    navTo(`/?${params.toString()}`);
   }
 
   return (

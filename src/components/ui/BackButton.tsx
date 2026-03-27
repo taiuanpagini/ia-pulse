@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "nextjs-toploader/app";
+import { useNavigation } from "@/contexts/NavigationContext";
 import MuiLink from "@mui/material/Link";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
@@ -10,13 +10,13 @@ interface BackButtonProps {
 }
 
 export function BackButton({ fallbackHref = "/", label = "Voltar" }: BackButtonProps) {
-  const router = useRouter();
+  const { back } = useNavigation();
 
   return (
     <MuiLink
       component="button"
       underline="none"
-      onClick={() => router.back()}
+      onClick={() => back()}
       sx={{
         display: "inline-flex",
         alignItems: "center",

@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter } from "nextjs-toploader/app";
 import { useSearchParams } from "next/navigation";
+import { useNavigation } from "@/contexts/NavigationContext";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Chip from "@mui/material/Chip";
@@ -29,14 +29,14 @@ interface DashboardTabsProps {
 }
 
 export function DashboardTabs({ activeTab, counts }: DashboardTabsProps) {
-  const router = useRouter();
+  const { navigate: navTo } = useNavigation();
   const searchParams = useSearchParams();
 
   function navigate(tabId: string) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("tab", tabId);
     params.delete("page");
-    router.push(`/?${params.toString()}`);
+    navTo(`/?${params.toString()}`);
   }
 
   const tabs: Tab[] = [
