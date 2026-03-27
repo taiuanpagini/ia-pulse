@@ -74,5 +74,11 @@ TrendSchema.index({ collectedAt: -1 });
 TrendSchema.index({ status: 1 });
 TrendSchema.index({ title: "text", summary: "text", titlePt: "text", summaryPt: "text" });
 
+// Em dev, apaga o modelo cacheado para garantir que o schema atual
+// (com campos novos como status, publishedAt, etc.) seja sempre usado
+if (process.env.NODE_ENV !== "production" && mongoose.models.Trend) {
+  mongoose.deleteModel("Trend");
+}
+
 export const Trend: Model<ITrend> =
   mongoose.models.Trend ?? mongoose.model<ITrend>("Trend", TrendSchema);

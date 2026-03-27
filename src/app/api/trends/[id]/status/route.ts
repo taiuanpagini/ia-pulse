@@ -28,15 +28,21 @@ export async function PATCH(
 
   await connectDB();
 
-  const trend = await Trend.findOneAndUpdate(
-    { _id: id },
-    { $set: { status: parsed.data.status, statusAt: new Date() } },
-    { new: true }
+  const objId = new mongoose.Types.ObjectId(id);
+  const now = new Date();
+
+  // Usa a collection diretamente para evitar que o strict mode do Mongoose
+  // filtre campos adicionados após o model ter sido cacheado no hot-reload
+  const result = await Trend.collection.updateOne(
+    { _id: objId },
+    { $set: { status: parsed.data.status, statusAt: now } }
   );
 
-  if (!trend) {
+  if (result.matchedCount === 0) {
     return NextResponse.json({ error: { message: "Tendência não encontrada" } }, { status: 404 });
   }
 
-  return NextResponse.json({ data: { id, status: trend.status, statusAt: trend.statusAt } });
+  return NextResponse.json({
+    data: { id, status: parsed.data.status, statusAt: now.toISOString() },
+  });
 }
