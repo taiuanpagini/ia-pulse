@@ -327,18 +327,35 @@ Resposta esperada:
 
 Acesse [vercel.com/new](https://vercel.com/new), importe o repositório e siga o assistente.
 
-### 2. Configurar variáveis de ambiente
+### 2. Configurar Build & Output Settings
+
+No painel do projeto → **Settings → General → Build & Development Settings**:
+
+| Configuração | Valor |
+|---|---|
+| **Framework Preset** | `Next.js` (detectado automaticamente) |
+| **Root Directory** | `.` (deixar vazio — o `package.json` está na raiz) |
+| **Build Command** | `next build` (ou deixar no padrão) |
+| **Output Directory** | `.next` (padrão do Next.js — não alterar) |
+| **Install Command** | `npm install` (padrão) |
+| **Node.js Version** | `18.x` (Settings → General → Node.js Version) |
+
+> Se o repositório tiver o projeto dentro de uma subpasta (ex: `app/`), defina o **Root Directory** com o caminho correto. Neste projeto, o `package.json` está na raiz, então deixe em branco ou `.`.
+
+### 3. Configurar variáveis de ambiente
 
 No painel do projeto → **Settings → Environment Variables**:
 
-| Variável | Valor |
-|---|---|
-| `MONGODB_URI` | Connection string do Atlas |
-| `CRON_SECRET` | String segura gerada no passo de setup |
-| `LLM_API_KEY` | (Opcional) Chave Gemini ou OpenAI |
-| `LLM_PROVIDER` | (Opcional) `gemini` ou `openai` |
+| Variável | Valor | Ambiente |
+|---|---|---|
+| `MONGODB_URI` | Connection string do Atlas | Production, Preview, Development |
+| `CRON_SECRET` | String segura gerada no passo de setup | Production, Preview, Development |
+| `LLM_API_KEY` | (Opcional) Chave Gemini ou OpenAI | Production |
+| `LLM_PROVIDER` | (Opcional) `gemini` ou `openai` | Production |
 
-### 3. Cron job
+> Adicione as variáveis nos três ambientes (**Production**, **Preview**, **Development**) para que funcionem em todos os deploys.
+
+### 4. Cron job
 
 O arquivo `vercel.json` já está configurado:
 
@@ -352,9 +369,9 @@ O arquivo `vercel.json` já está configurado:
 
 > O schedule `0 7 * * 1` executa toda **segunda-feira às 07:00 UTC** (04:00 horário de Brasília). Para alterar a frequência, basta mudar o cron expression.
 
-Após o deploy, confirme em **Settings → Cron Jobs** no painel da Vercel.
+Após o deploy, confirme em **Settings → Cron Jobs** que o job aparece listado. Na primeira execução, as tendências aparecerão no dashboard automaticamente.
 
-**Limitação do free tier:** Funções serverless têm timeout de 10s. Os coletores rodam em paralelo com `Promise.allSettled()` e timeout individual de 8s por fonte — falha em uma fonte não afeta as demais.
+> **Limitação do free tier:** Funções serverless têm timeout de 10s. Os coletores rodam em paralelo com `Promise.allSettled()` e timeout individual de 8s por fonte — falha em uma fonte não afeta as demais.
 
 ---
 
