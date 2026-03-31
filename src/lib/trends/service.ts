@@ -175,7 +175,7 @@ export async function listTrends(filters: Partial<TrendFilters>): Promise<TrendL
   ]);
   const topicMap = new Map<string, ITopic>(topics.map((t) => [t.slug, t]));
   return {
-    data: (items as Array<ITrend & { _id: unknown }>).map((t) => toTrendListItem(t, topicMap)),
+    data: (items as unknown as Array<ITrend & { _id: unknown }>).map((t) => toTrendListItem(t, topicMap)),
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
   };
 }
@@ -208,10 +208,10 @@ export async function getRankingData(
     findAllTopics(),
   ]);
   const topicMap = new Map<string, ITopic>(topics.map((t) => [t.slug, t]));
-  const carousel = (carouselRaw as Array<ITrend & { _id: unknown }>)
+  const carousel = (carouselRaw as unknown as Array<ITrend & { _id: unknown }>)
     .filter((t) => t.score != null)
     .map((t) => toScoredCard(t, topicMap));
-  const trends = (gridResult.items as Array<ITrend & { _id: unknown }>)
+  const trends = (gridResult.items as unknown as Array<ITrend & { _id: unknown }>)
     .filter((t) => t.score != null)
     .map((t) => toScoredCard(t, topicMap));
   return { carousel, trends, total: gridResult.total };
@@ -229,7 +229,7 @@ export async function getStatusTabData(
     findAllTopics(),
   ]);
   const topicMap = new Map<string, ITopic>(topics.map((t) => [t.slug, t]));
-  const trends = (result.items as Array<ITrend & { _id: unknown }>).map((t) =>
+  const trends = (result.items as unknown as Array<ITrend & { _id: unknown }>).map((t) =>
     t.score != null ? toScoredCard(t, topicMap) : toUnscoredCard(t, topicMap)
   );
   return { trends, total: result.total };
@@ -246,7 +246,7 @@ export async function getAwaitingData(
     findAllTopics(),
   ]);
   const topicMap = new Map<string, ITopic>(topics.map((t) => [t.slug, t]));
-  const trends = (result.items as Array<ITrend & { _id: unknown }>).map((t) =>
+  const trends = (result.items as unknown as Array<ITrend & { _id: unknown }>).map((t) =>
     toUnscoredCard(t, topicMap)
   );
   return { trends, total: result.total };
@@ -273,10 +273,10 @@ export async function getDashboardData(
     findAllTopics(),
   ]);
   const topicMap = new Map<string, ITopic>(topics.map((t) => [t.slug, t]));
-  const scored = (scoredResult.items as Array<ITrend & { _id: unknown }>)
+  const scored = (scoredResult.items as unknown as Array<ITrend & { _id: unknown }>)
     .filter((t) => t.score != null)
     .map((t) => toScoredCard(t, topicMap));
-  const unscored = (unscoredResult.items as Array<ITrend & { _id: unknown }>).map((t) =>
+  const unscored = (unscoredResult.items as unknown as Array<ITrend & { _id: unknown }>).map((t) =>
     toUnscoredCard(t, topicMap)
   );
   return {
