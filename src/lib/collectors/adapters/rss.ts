@@ -67,7 +67,7 @@ export async function collectRssFeed(
     const summary = (
       entry.contentSnippet ??
       entry.summary ??
-      (entry as Record<string, unknown>).contentEncoded as string | undefined ??
+      (entry as unknown as Record<string, unknown>).contentEncoded as string | undefined ??
       ""
     )
       .replace(/<[^>]+>/g, "")
