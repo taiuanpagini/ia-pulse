@@ -31,7 +31,13 @@ export const RSS_FEEDS: RssFeedConfig[] = [
   },
 
   // ── Regulamentação ────────────────────────────────────────────────
-  // Future of Life Institute removido: feed RSS muito lento (timeout > 8s em produção)
+  {
+    url: "https://algorithmwatch.org/en/feed/",
+    source: "AlgorithmWatch",
+    topicSlug: "regulamentacao",
+    maxItems: 3,
+    relevanceFilter: true,
+  },
 
   // ── Geral — Newsletters / curadas (sem filtro: alta relação sinal/ruído) ──
   {

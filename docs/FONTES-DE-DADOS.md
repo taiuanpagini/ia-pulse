@@ -30,10 +30,13 @@ A coleta usa janela de **8 dias** nas fontes que suportam filtro por data, garan
 **Como filtramos:**
 
 ```
-Categorias: cs.LG (Machine Learning) + cs.AR (Hardware Architecture)
 Queries aplicadas:
   - cat:cs.LG AND (ti:quantization OR ti:deployment OR ti:inference OR ti:optimization)
-  - cat:cs.LG AND (ti:regulation OR ti:privacy OR ti:compliance OR ti:governance)
+    → tópico: infraestrutura (cs.LG = Machine Learning)
+
+  - cat:cs.CY AND (ti:regulation OR ti:governance OR ti:compliance OR ti:policy OR ti:ethics)
+    → tópico: regulamentação (cs.CY = Computers and Society — categoria correta para IA e regulação)
+
 Ordenação: data de submissão (mais recente primeiro)
 Limite: 3 papers por query = 6 total
 ```
@@ -78,7 +81,7 @@ Queries:
   - "AI business application ROI deployment" → tópico: geral
 
 Filtros:
-  - citationCount >= 10
+  - citationCount >= 10 (padrão); >= 5 para regulamentação (papers de policy citam menos)
   - publicationDateOrYear >= 12 meses atrás
   - Ordenado por citações decrescente
   - Delay de 1.5s entre queries (evitar rate limit 429)
@@ -160,6 +163,15 @@ Fontes curadas editorialmente (NVIDIA, Hugging Face, Import AI) **não precisam 
 - [huggingface.co/blog](https://huggingface.co/blog)
 - [blog.google/technology/ai](https://blog.google/technology/ai/)
 
+#### Regulamentação
+
+| Fonte | URL do feed | maxItems | Filtro |
+|---|---|---|---|
+| AlgorithmWatch | `algorithmwatch.org/en/feed/` | 3 | **Sim** |
+
+**Verificar:**
+- [algorithmwatch.org](https://algorithmwatch.org)
+
 #### Geral — Newsletter curada
 
 | Fonte | URL do feed | maxItems | Filtro |
@@ -199,7 +211,7 @@ Fontes curadas editorialmente (NVIDIA, Hugging Face, Import AI) **não precisam 
 
 | Fonte | Motivo da remoção |
 |---|---|
-| Future of Life Institute | Timeout consistente > 8s em produção |
+| Future of Life Institute | Timeout consistente > 8s em produção (substituído por AlgorithmWatch) |
 | EUR-Lex AI Act | XML malformado / feed instável |
 | ANPD (Brasil) | HTTP 404 — URL mudou |
 | NIST AI RMF | HTTP 404 — URL mudou |
@@ -217,20 +229,21 @@ Para reativar qualquer feed quando o problema for corrigido, basta adicionar o o
 
 Com as fontes ativas, a coleta semanal típica produz:
 
-| Fonte | Itens esperados (novos/semana) |
-|---|---|
-| arXiv | 3–6 |
-| HackerNews | 2–5 |
-| Semantic Scholar | 2–5 |
-| NVIDIA Developer Blog | 2–3 |
-| Hugging Face Blog | 2–3 |
-| Google AI Blog | 2–3 |
-| Import AI | 2–3 |
-| VentureBeat AI | 2–4 (após filtro) |
-| MIT Technology Review AI | 1–3 (após filtro) |
-| TechCrunch AI | 2–4 (após filtro) |
-| The Decoder | 1–3 (após filtro) |
-| Olhar Digital | 1–2 (após filtro) |
-| **Total estimado** | **20–40 novos por semana** |
+| Fonte | Tópico | Itens esperados (novos/semana) |
+|---|---|---|
+| arXiv | Infraestrutura + Regulamentação | 3–6 |
+| HackerNews | Geral | 2–5 |
+| Semantic Scholar | Infra + Regulamentação + Geral | 2–5 |
+| NVIDIA Developer Blog | Infraestrutura | 2–3 |
+| Hugging Face Blog | Infraestrutura | 2–3 |
+| Google AI Blog | Infraestrutura | 2–3 |
+| AlgorithmWatch | Regulamentação | 1–3 (após filtro) |
+| Import AI | Geral | 2–3 |
+| VentureBeat AI | Geral | 2–4 (após filtro) |
+| MIT Technology Review AI | Geral | 1–3 (após filtro) |
+| TechCrunch AI | Geral | 2–4 (após filtro) |
+| The Decoder | Geral | 1–3 (após filtro) |
+| Olhar Digital | Geral | 1–2 (após filtro) |
+| **Total estimado** | | **20–40 novos por semana** |
 
 O sistema deduplica por URL — itens já coletados anteriormente são ignorados automaticamente.

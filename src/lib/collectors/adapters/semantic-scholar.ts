@@ -3,16 +3,17 @@ import { CollectedItem, CollectorResult } from "../types";
 const API_BASE = "https://api.semanticscholar.org/graph/v1";
 const SOURCE = "Semantic Scholar";
 
-const QUERIES: { query: string; topicSlug: string }[] = [
+const QUERIES: { query: string; topicSlug: string; minCitations?: number }[] = [
   { query: "LLM fine-tuning production enterprise", topicSlug: "infraestrutura" },
-  { query: "AI regulation compliance enterprise risk", topicSlug: "regulamentacao" },
+  // Regulação tem menos papers citados em 12 meses — threshold menor
+  { query: "AI regulation governance policy risk", topicSlug: "regulamentacao", minCitations: 5 },
   { query: "AI business application ROI deployment", topicSlug: "geral" },
 ];
 
 const LIMIT_PER_QUERY = 8;
 
-// >= 10 citações = reconhecimento real na comunidade científica
-const MIN_CITATIONS = 10;
+// >= 10 citações padrão; cada query pode sobrescrever com minCitations
+const DEFAULT_MIN_CITATIONS = 10;
 
 // Apenas papers dos últimos 12 meses
 function minPublicationDate(): string {
@@ -43,7 +44,7 @@ export async function collectSemanticScholar(
   const items: CollectedItem[] = [];
 
   for (let idx = 0; idx < QUERIES.length; idx++) {
-    const { query, topicSlug } = QUERIES[idx];
+    const { query, topicSlug, minCitations = DEFAULT_MIN_CITATIONS } = QUERIES[idx];
     // Delay entre queries para evitar rate limit 429 (API pública sem key)
     if (idx > 0) await new Promise((r) => setTimeout(r, 1500));
 
@@ -60,7 +61,7 @@ export async function collectSemanticScholar(
     const data = (await response.json()) as SSResponse;
 
     const filtered = (data.data ?? [])
-      .filter((p) => (p.citationCount ?? 0) >= MIN_CITATIONS)
+      .filter((p) => (p.citationCount ?? 0) >= minCitations)
       .sort((a, b) => (b.citationCount ?? 0) - (a.citationCount ?? 0))
       .slice(0, 3);
 

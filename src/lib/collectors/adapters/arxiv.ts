@@ -10,7 +10,8 @@ const QUERIES: { query: string; topicSlug: string }[] = [
     topicSlug: "infraestrutura",
   },
   {
-    query: "cat:cs.LG AND (ti:regulation OR ti:privacy OR ti:compliance OR ti:governance)",
+    // cs.CY = Computers and Society — categoria correta para papers de regulação de IA
+    query: "cat:cs.CY AND (ti:regulation OR ti:governance OR ti:compliance OR ti:policy OR ti:ethics)",
     topicSlug: "regulamentacao",
   },
 ];
