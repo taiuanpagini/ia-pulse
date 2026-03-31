@@ -4,7 +4,7 @@ import { runCollectors } from "@/lib/collectors/orchestrator";
 
 export const maxDuration = 60;
 
-export async function POST(request: NextRequest): Promise<NextResponse> {
+async function handleCollect(request: NextRequest): Promise<NextResponse> {
   const authHeader = request.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET;
 
@@ -38,3 +38,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
+
+// Vercel Cron Jobs chamam via GET com Authorization: Bearer <CRON_SECRET>
+export const GET = handleCollect;
+
+// Chamadas manuais via POST (testes locais, curl, etc.)
+export const POST = handleCollect;
