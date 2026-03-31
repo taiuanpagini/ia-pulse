@@ -31,12 +31,7 @@ export const RSS_FEEDS: RssFeedConfig[] = [
   },
 
   // ── Regulamentação ────────────────────────────────────────────────
-  {
-    url: "https://futureoflife.org/feed/",
-    source: "Future of Life Institute",
-    topicSlug: "regulamentacao",
-    maxItems: 2,
-  },
+  // Future of Life Institute removido: feed RSS muito lento (timeout > 8s em produção)
 
   // ── Geral — Newsletters / curadas (sem filtro: alta relação sinal/ruído) ──
   {

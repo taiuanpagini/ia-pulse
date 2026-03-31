@@ -13,13 +13,13 @@ O IAPulse usa **dois tipos de integração**:
 | **APIs REST** | Consulta com parâmetros de filtro direto na API | Um adapter dedicado por fonte |
 | **RSS Feeds** | Lê o feed XML, aplica filtros opcionais | Um adapter genérico configurável |
 
-Todos os adapters rodam em **paralelo** via `Promise.allSettled()` — falha em uma fonte não afeta as demais. Cada adapter tem timeout individual de **8 segundos** (limite do Vercel free tier).
+Todos os adapters rodam em **paralelo** via `Promise.allSettled()` — falha em uma fonte não afeta as demais. Cada adapter tem timeout individual de **8 segundos**.
 
 A coleta usa janela de **8 dias** nas fontes que suportam filtro por data, garantindo que coletas semanais tragam apenas conteúdo genuinamente novo.
 
 ---
 
-## APIs REST
+## APIs REST ativas
 
 ### arXiv
 
@@ -38,7 +38,7 @@ Ordenação: data de submissão (mais recente primeiro)
 Limite: 3 papers por query = 6 total
 ```
 
-**Verificar manualmente:** [arxiv.org/search/?searchtype=all&query=LLM+deployment](https://arxiv.org/search/?searchtype=all&query=LLM+deployment&start=0)
+**Verificar manualmente:** [arxiv.org/search/?query=LLM+deployment](https://arxiv.org/search/?searchtype=all&query=LLM+deployment&start=0)
 
 ---
 
@@ -46,45 +46,20 @@ Limite: 3 papers por query = 6 total
 
 **O que é:** Fórum da comunidade técnica do Vale do Silício. Posts são upvotados por engenheiros e pesquisadores — alto engajamento = genuinamente relevante para o mercado.
 
-**Por que usamos:** É um dos melhores sinais de "o que a comunidade técnica considera importante hoje".
+**Por que usamos:** Um dos melhores sinais de "o que a comunidade técnica considera importante hoje".
 
 **Como filtramos:**
 
 ```
 Queries: "LLM production deployment", "AI tool launch enterprise", "machine learning open source release"
 Filtros:
-  - points >= 300 (era 50 — aumentado 6x)
+  - points >= 300
   - num_comments >= 20
   - created_at_i >= 8 dias atrás (só posts novos)
 Limite: 4 resultados por query
 ```
 
 **Verificar manualmente:** [hn.algolia.com/?query=LLM+production&dateRange=pastWeek](https://hn.algolia.com/?query=LLM+production&dateRange=pastWeek)
-
----
-
-### Reddit
-
-**O que é:** Subreddits técnicos de IA. Posts com muitos upvotes representam temas quentes na comunidade de ML/LLM.
-
-**Subreddits monitorados:**
-
-| Subreddit | Tópico | Por quê |
-|---|---|---|
-| r/MachineLearning | Infraestrutura | Pesquisadores e engenheiros de ML — papers e implementações |
-| r/LocalLLaMA | Infraestrutura | Comunidade de LLMs locais — quantização, edge, open-source |
-| r/artificial | Geral | Notícias gerais de IA com ampla audiência |
-
-**Como filtramos:**
-
-```
-Score mínimo: 500 upvotes (era 20 — aumentado 25x)
-Janela: criados nos últimos 8 dias
-Máximo: 3 posts por subreddit = 9 total
-Ordenação: hot (os mais engajados no momento)
-```
-
-**Verificar manualmente:** [reddit.com/r/MachineLearning/top/?t=week](https://www.reddit.com/r/MachineLearning/top/?t=week)
 
 ---
 
@@ -103,33 +78,27 @@ Queries:
   - "AI business application ROI deployment" → tópico: geral
 
 Filtros:
-  - citationCount >= 10 (era 1 — aumentado 10x)
-  - publicationDateOrYear >= 12 meses atrás (últimos 12 meses)
+  - citationCount >= 10
+  - publicationDateOrYear >= 12 meses atrás
   - Ordenado por citações decrescente
+  - Delay de 1.5s entre queries (evitar rate limit 429)
 Limite: 3 papers por query = 9 total (após filtro)
 ```
 
-**Verificar manualmente:** [api.semanticscholar.org/graph/v1/paper/search?query=LLM+enterprise&fields=title,citationCount,year](https://api.semanticscholar.org/graph/v1/paper/search?query=LLM+enterprise&fields=title,citationCount,year&limit=5)
+**Verificar manualmente:** [semanticscholar.org/search?q=LLM+enterprise](https://www.semanticscholar.org/search?q=LLM+enterprise&sort=Relevance)
 
-> **Nota:** A API tem rate limit. Se rodar o script de coleta várias vezes seguidas, pode retornar 429 (Too Many Requests). Em produção (1x/semana), funciona normalmente.
+> **Nota:** A API pública tem rate limit. Pode retornar 429 se chamada muito próximo de uma execução anterior. Em produção (1x/semana), funciona normalmente.
 
 ---
 
-### Papers With Code
+## APIs REST removidas
 
-**O que é:** Plataforma que indexa papers de ML que vêm acompanhados de código no GitHub. É o indicador mais direto de "implementabilidade".
+| Fonte | Motivo |
+|---|---|
+| **Reddit** | Bloqueia IPs de datacenter (AWS/Vercel) com HTTP 403. Funciona localmente mas não em cloud. |
+| **Papers With Code** | API retorna HTML em vez de JSON quando chamada de servidor cloud. |
 
-**Por que usamos:** Se o paper tem código público, podemos reproduzir, estudar e adaptar para PoC. Sem código = teoria apenas.
-
-**Como filtramos:**
-
-```
-Endpoint: /api/v1/papers/?ordering=-github_link
-Filtro obrigatório: apenas papers com github_link != null
-Limite: 5 papers (os com mais links para código)
-```
-
-**Verificar manualmente:** [paperswithcode.com/latest](https://paperswithcode.com/latest)
+> Se quiser usar essas fontes localmente via `npm run collect`, os adapters ainda existem em `src/lib/collectors/adapters/`. Basta reativá-los no `orchestrator.ts`.
 
 ---
 
@@ -172,7 +141,7 @@ Português:      inteligência artificial, regulamentação, conformidade,
                 implementação, ferramenta, modelo, agente, automação
 ```
 
-Fontes curadas editorialmente (NVIDIA, Hugging Face, Import AI, Future of Life) **não precisam de filtro** — já publicam apenas conteúdo técnico de IA.
+Fontes curadas editorialmente (NVIDIA, Hugging Face, Import AI) **não precisam de filtro** — já publicam apenas conteúdo técnico de IA.
 
 ---
 
@@ -191,15 +160,13 @@ Fontes curadas editorialmente (NVIDIA, Hugging Face, Import AI, Future of Life) 
 - [huggingface.co/blog](https://huggingface.co/blog)
 - [blog.google/technology/ai](https://blog.google/technology/ai/)
 
-#### Regulamentação
+#### Geral — Newsletter curada
 
 | Fonte | URL do feed | maxItems | Filtro |
 |---|---|---|---|
-| Future of Life Institute | `futureoflife.org/feed/` | 2 | Não (curado) |
 | Import AI | `jack-clark.net/feed/` | 3 | Não (curado) |
 
 **Verificar:**
-- [futureoflife.org](https://futureoflife.org)
 - [jack-clark.net](https://jack-clark.net)
 
 #### Notícias de mercado
@@ -228,12 +195,11 @@ Fontes curadas editorialmente (NVIDIA, Hugging Face, Import AI, Future of Life) 
 
 ---
 
-## Feeds removidos (e por quê)
-
-Estes feeds foram testados e removidos por estarem inacessíveis ou com problemas técnicos:
+## Feeds RSS removidos
 
 | Fonte | Motivo da remoção |
 |---|---|
+| Future of Life Institute | Timeout consistente > 8s em produção |
 | EUR-Lex AI Act | XML malformado / feed instável |
 | ANPD (Brasil) | HTTP 404 — URL mudou |
 | NIST AI RMF | HTTP 404 — URL mudou |
@@ -243,22 +209,28 @@ Estes feeds foram testados e removidos por estarem inacessíveis ou com problema
 | Canaltech | HTTP 404 — URL mudou |
 | MCTI Brasil | HTTP 404 — URL mudou |
 
-Se alguma dessas fontes corrigir a URL do feed, basta reativar em `rss-feeds.config.ts`.
+Para reativar qualquer feed quando o problema for corrigido, basta adicionar o objeto em `rss-feeds.config.ts`.
 
 ---
 
-## Como estimar o volume de coleta
+## Volume de coleta esperado
 
-Com os filtros atuais, a coleta semanal típica produz:
+Com as fontes ativas, a coleta semanal típica produz:
 
 | Fonte | Itens esperados (novos/semana) |
 |---|---|
 | arXiv | 3–6 |
 | HackerNews | 2–5 |
-| Reddit | 2–6 |
-| Semantic Scholar | 2–5 (sujeito a rate limit) |
-| Papers With Code | 0–5 (sujeito a disponibilidade da API) |
-| RSS Feeds (todos) | 10–20 (após filtro de relevância) |
+| Semantic Scholar | 2–5 |
+| NVIDIA Developer Blog | 2–3 |
+| Hugging Face Blog | 2–3 |
+| Google AI Blog | 2–3 |
+| Import AI | 2–3 |
+| VentureBeat AI | 2–4 (após filtro) |
+| MIT Technology Review AI | 1–3 (após filtro) |
+| TechCrunch AI | 2–4 (após filtro) |
+| The Decoder | 1–3 (após filtro) |
+| Olhar Digital | 1–2 (após filtro) |
 | **Total estimado** | **20–40 novos por semana** |
 
 O sistema deduplica por URL — itens já coletados anteriormente são ignorados automaticamente.

@@ -99,12 +99,11 @@ O sistema coleta de **três tipos de fonte**:
 
 ### 1. Comunidades técnicas (APIs)
 
-São fóruns e plataformas onde desenvolvedores e pesquisadores discutem e validam novidades. O sistema só pega o que a própria comunidade já considerou relevante (medido por votos, citações e engajamento).
+São fóruns e plataformas onde desenvolvedores e pesquisadores discutem e validam novidades. O sistema só pega o que a própria comunidade já considerou relevante (medido por votos e engajamento).
 
 | Fonte | O que é | Por que usamos |
 |---|---|---|
 | **HackerNews** | Fórum da comunidade de tecnologia do Vale do Silício | Posts com 300+ pontos e 20+ comentários = genuinamente relevante para o mercado |
-| **Reddit** | Subreddits r/MachineLearning e r/LocalLLaMA | Posts com 500+ upvotes na semana = temas quentes na comunidade técnica |
 
 ### 2. Pesquisa acadêmica (APIs)
 
@@ -114,7 +113,6 @@ Papers e artigos científicos com evidência de impacto real.
 |---|---|---|
 | **arXiv** | Repositório de pre-prints de IA e computação | Papers mais recentes de ML aplicado e infraestrutura |
 | **Semantic Scholar** | Base de papers com contagem de citações | Papers dos últimos 12 meses com 10+ citações = reconhecimento da comunidade científica |
-| **Papers With Code** | Papers que vieram com código público (GitHub) | Se tem código publicado, é implementável — direto para PoC |
 
 ### 3. Blogs e newsletters curados (RSS)
 
@@ -123,7 +121,7 @@ Publicações de organizações referência que já fazem curadoria editorial.
 | Categoria | Fontes |
 |---|---|
 | **Infraestrutura** | NVIDIA Developer Blog, Hugging Face Blog, Google AI Blog |
-| **Regulamentação** | Future of Life Institute, Import AI |
+| **Geral / Curado** | Import AI |
 | **Notícias de mercado** | VentureBeat AI, MIT Technology Review AI, TechCrunch AI, The Decoder |
 | **Brasil** | Olhar Digital |
 
@@ -135,14 +133,12 @@ Publicações de organizações referência que já fazem curadoria editorial.
 
 O IAPulse não coleta "tudo" — ele aplica filtros para garantir que só entra o que tem valor real:
 
-### Filtros por engajamento (comunidades)
+### Filtros por engajamento (comunidades e papers)
 
 | Fonte | Filtro aplicado |
 |---|---|
 | HackerNews | Mínimo 300 pontos + 20 comentários + publicado nos últimos 8 dias |
-| Reddit | Mínimo 500 upvotes + publicado nos últimos 8 dias |
-| Semantic Scholar | Mínimo 10 citações + publicado nos últimos 12 meses |
-| Papers With Code | Apenas papers com repositório GitHub público |
+| Semantic Scholar | Mínimo 10 citações + publicado nos últimos 12 meses + delay entre queries para evitar rate limit |
 
 ### Filtros por palavras-chave (notícias)
 

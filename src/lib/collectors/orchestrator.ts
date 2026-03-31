@@ -1,12 +1,13 @@
 import { CollectedItem, CollectorResult } from "./types";
 import { collectArxiv } from "./adapters/arxiv";
 import { collectHackerNews } from "./adapters/hackernews";
-import { collectReddit } from "./adapters/reddit";
 import { collectSemanticScholar } from "./adapters/semantic-scholar";
-import { collectPapersWithCode } from "./adapters/papers-with-code";
 import { collectRssFeed } from "./adapters/rss";
 import { RSS_FEEDS } from "./config/rss-feeds.config";
 import { upsertTrends } from "@/lib/mongodb/repositories/trend.repository";
+
+// Reddit bloqueia IPs de datacenter (403) e Papers With Code bloqueia requests
+// server-side de cloud providers — ambos removidos do cron de produção.
 
 const ADAPTER_TIMEOUT_MS = 8000;
 
@@ -46,9 +47,7 @@ export async function runCollectors(): Promise<OrchestratorReport> {
   const tagged: TaggedCollector[] = [
     { source: "arXiv", fn: collectArxiv },
     { source: "HackerNews", fn: collectHackerNews },
-    { source: "Reddit", fn: collectReddit },
     { source: "Semantic Scholar", fn: collectSemanticScholar },
-    { source: "Papers With Code", fn: collectPapersWithCode },
     ...RSS_FEEDS.map((feed) => ({
       source: feed.source,
       fn: (signal?: AbortSignal) => collectRssFeed(feed, signal),

@@ -42,7 +42,10 @@ export async function collectSemanticScholar(
   const seen = new Set<string>();
   const items: CollectedItem[] = [];
 
-  for (const { query, topicSlug } of QUERIES) {
+  for (const [idx, { query, topicSlug }] of QUERIES.entries()) {
+    // Delay entre queries para evitar rate limit 429 (API pública sem key)
+    if (idx > 0) await new Promise((r) => setTimeout(r, 1500));
+
     const url =
       `${API_BASE}/paper/search` +
       `?query=${encodeURIComponent(query)}` +
