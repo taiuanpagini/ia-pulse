@@ -18,7 +18,7 @@ export const ScoreFormSchema = z.object({
   competitiveImpact: criteriaField,
   strategicAlignment: criteriaField,
   adoptionComplexity: criteriaField,
-  notes: z.string().max(2000).default(""),
+  notes: z.string().max(2000).optional(),
 });
 
 export type ScoreFormValues = z.infer<typeof ScoreFormSchema>;
