@@ -4,14 +4,17 @@ const SOURCE = "Reddit";
 
 const SUBREDDITS = [
   { name: "MachineLearning", topicSlug: "infraestrutura" },
-  { name: "artificial", topicSlug: "geral" },
   { name: "LocalLLaMA", topicSlug: "infraestrutura" },
+  { name: "artificial", topicSlug: "geral" },
 ];
 
-// Posts com poucos upvotes são ruído — mínimo para garantir relevância
-const MIN_SCORE = 20;
-const LIMIT_PER_SUB = 25; // busca mais para filtrar pelo score
-const MAX_KEEP = 8;       // mantém só os melhores por subreddit
+// >= 500 upvotes = post amplamente validado pela comunidade; filtra opinião e ruído
+const MIN_SCORE = 500;
+const LIMIT_PER_SUB = 25;
+const MAX_KEEP = 3;
+
+// Janela de 8 dias para garantir apenas posts genuinamente novos
+const SINCE_UTC = Math.floor((Date.now() - 8 * 24 * 60 * 60 * 1000) / 1000);
 
 interface RedditPost {
   data: {
@@ -46,9 +49,8 @@ export async function collectReddit(
 
     const data = (await response.json()) as RedditListing;
 
-    // Ordena por score e filtra mínimo
     const filtered = data.data.children
-      .filter((p) => p.data.score >= MIN_SCORE)
+      .filter((p) => p.data.score >= MIN_SCORE && (p.data.created_utc ?? 0) >= SINCE_UTC)
       .sort((a, b) => b.data.score - a.data.score)
       .slice(0, MAX_KEEP);
 

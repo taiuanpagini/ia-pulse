@@ -20,12 +20,20 @@ export interface OrchestratorReport {
 
 type CollectorFn = (signal?: AbortSignal) => Promise<{ items: CollectedItem[]; result: CollectorResult }>;
 
-function withTimeout(fn: CollectorFn): () => Promise<{ items: CollectedItem[]; result: CollectorResult }> {
+interface TaggedCollector {
+  source: string;
+  fn: CollectorFn;
+}
+
+function withTimeout(tagged: TaggedCollector): () => Promise<{ items: CollectedItem[]; result: CollectorResult }> {
   return async () => {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), ADAPTER_TIMEOUT_MS);
     try {
-      return await fn(controller.signal);
+      return await tagged.fn(controller.signal);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      throw new Error(`[${tagged.source}] ${msg}`);
     } finally {
       clearTimeout(timer);
     }
@@ -35,43 +43,31 @@ function withTimeout(fn: CollectorFn): () => Promise<{ items: CollectedItem[]; r
 export async function runCollectors(): Promise<OrchestratorReport> {
   const start = Date.now();
 
-  const apiCollectors: CollectorFn[] = [
-    collectArxiv,
-    collectHackerNews,
-    collectReddit,
-    collectSemanticScholar,
-    collectPapersWithCode,
+  const tagged: TaggedCollector[] = [
+    { source: "arXiv", fn: collectArxiv },
+    { source: "HackerNews", fn: collectHackerNews },
+    { source: "Reddit", fn: collectReddit },
+    { source: "Semantic Scholar", fn: collectSemanticScholar },
+    { source: "Papers With Code", fn: collectPapersWithCode },
+    ...RSS_FEEDS.map((feed) => ({
+      source: feed.source,
+      fn: (signal?: AbortSignal) => collectRssFeed(feed, signal),
+    })),
   ];
 
-  const rssCollectors: CollectorFn[] = RSS_FEEDS.map(
-    (feed) => (signal?: AbortSignal) => collectRssFeed(feed, signal)
-  );
-
-  const allCollectors = [...apiCollectors, ...rssCollectors].map(withTimeout);
-
-  const settled = await Promise.allSettled(allCollectors.map((fn) => fn()));
+  const runners = tagged.map(withTimeout);
+  const settled = await Promise.allSettled(runners.map((fn) => fn()));
 
   const allItems: CollectedItem[] = [];
   const sourceResults: CollectorResult[] = [];
 
-  for (const outcome of settled) {
+  settled.forEach((outcome, i) => {
+    const sourceName = tagged[i].source;
     if (outcome.status === "fulfilled") {
       allItems.push(...outcome.value.items);
       sourceResults.push(outcome.value.result);
     } else {
       const errMsg = outcome.reason instanceof Error ? outcome.reason.message : String(outcome.reason);
-      const sourceName = errMsg.includes("arXiv")
-        ? "arXiv"
-        : errMsg.includes("HackerNews")
-        ? "HackerNews"
-        : errMsg.includes("Reddit")
-        ? "Reddit"
-        : errMsg.includes("Semantic Scholar")
-        ? "Semantic Scholar"
-        : errMsg.includes("Papers With Code")
-        ? "Papers With Code"
-        : "Unknown RSS";
-
       console.error(`[IAPulse] Collector failed: ${sourceName} — ${errMsg}`);
       sourceResults.push({
         source: sourceName,
@@ -81,7 +77,7 @@ export async function runCollectors(): Promise<OrchestratorReport> {
         error: errMsg,
       });
     }
-  }
+  });
 
   const { inserted, skipped } = await upsertTrends(allItems);
 

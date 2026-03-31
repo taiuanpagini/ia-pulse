@@ -3,14 +3,20 @@ import { CollectedItem, CollectorResult } from "../types";
 const ARXIV_BASE = "https://export.arxiv.org/api/query";
 const SOURCE = "arXiv";
 
-// Queries mistas por categoria + termos aplicados — reduz papers puramente teóricos
+// Queries focadas em papers aplicados — deployment, ferramentas, otimização real
 const QUERIES: { query: string; topicSlug: string }[] = [
-  { query: "cat:cs.LG AND (ti:quantization OR ti:deployment OR ti:inference)", topicSlug: "infraestrutura" },
-  { query: "cat:cs.AR AND (ti:GPU OR ti:TPU OR ti:neural)", topicSlug: "infraestrutura" },
-  { query: "cat:cs.LG AND (ti:regulation OR ti:privacy OR ti:fairness)", topicSlug: "regulamentacao" },
+  {
+    query: "cat:cs.LG AND (ti:quantization OR ti:deployment OR ti:inference OR ti:optimization)",
+    topicSlug: "infraestrutura",
+  },
+  {
+    query: "cat:cs.LG AND (ti:regulation OR ti:privacy OR ti:compliance OR ti:governance)",
+    topicSlug: "regulamentacao",
+  },
 ];
 
-const MAX_PER_QUERY = 8;
+// 3 por query = apenas os mais recentes com maior relevância
+const MAX_PER_QUERY = 3;
 
 function extractText(xml: string, tag: string): string {
   const match = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\/${tag}>`, "i").exec(xml);

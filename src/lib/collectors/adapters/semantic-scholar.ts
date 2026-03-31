@@ -3,15 +3,23 @@ import { CollectedItem, CollectorResult } from "../types";
 const API_BASE = "https://api.semanticscholar.org/graph/v1";
 const SOURCE = "Semantic Scholar";
 
-// Foco em papers com impacto real — citados por outros trabalhos
 const QUERIES: { query: string; topicSlug: string }[] = [
-  { query: "LLM fine-tuning production", topicSlug: "infraestrutura" },
-  { query: "AI regulation compliance risk", topicSlug: "regulamentacao" },
-  { query: "machine learning business application ROI", topicSlug: "geral" },
+  { query: "LLM fine-tuning production enterprise", topicSlug: "infraestrutura" },
+  { query: "AI regulation compliance enterprise risk", topicSlug: "regulamentacao" },
+  { query: "AI business application ROI deployment", topicSlug: "geral" },
 ];
 
-const LIMIT_PER_QUERY = 10;
-const MIN_CITATIONS = 1; // ao menos 1 citação = algum reconhecimento acadêmico
+const LIMIT_PER_QUERY = 8;
+
+// >= 10 citações = reconhecimento real na comunidade científica
+const MIN_CITATIONS = 10;
+
+// Apenas papers dos últimos 12 meses
+function minPublicationDate(): string {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() - 1);
+  return d.toISOString().split("T")[0]; // YYYY-MM-DD
+}
 
 interface SSPaper {
   paperId: string;
@@ -39,6 +47,7 @@ export async function collectSemanticScholar(
       `${API_BASE}/paper/search` +
       `?query=${encodeURIComponent(query)}` +
       `&fields=title,abstract,externalIds,url,citationCount,year,publicationDate` +
+      `&publicationDateOrYear=${minPublicationDate()}:` +
       `&limit=${LIMIT_PER_QUERY}`;
 
     const response = await fetch(url, { signal });
@@ -46,10 +55,10 @@ export async function collectSemanticScholar(
 
     const data = (await response.json()) as SSResponse;
 
-    // Filtra por citações mínimas e ordena pelos mais citados
     const filtered = (data.data ?? [])
       .filter((p) => (p.citationCount ?? 0) >= MIN_CITATIONS)
-      .sort((a, b) => (b.citationCount ?? 0) - (a.citationCount ?? 0));
+      .sort((a, b) => (b.citationCount ?? 0) - (a.citationCount ?? 0))
+      .slice(0, 3);
 
     for (const paper of filtered) {
       const itemUrl =

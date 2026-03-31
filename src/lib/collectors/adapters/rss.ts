@@ -9,6 +9,35 @@ const parser = new Parser({
   },
 });
 
+/**
+ * Palavras-chave de IA aplicada — item é mantido se título ou resumo
+ * contiver ao menos uma. Filtra opinião pura, artigos genéricos e posts
+ * sem aplicabilidade real (PoC, produto, ferramenta, regulação).
+ */
+const PRACTICAL_AI_KEYWORDS = [
+  // Modelos e ferramentas
+  "llm", "gpt", "claude", "gemini", "llama", "mistral", "phi", "qwen", "grok",
+  "model release", "open-source", "open source", "sdk", "api",
+  // Infraestrutura e produção
+  "deploy", "production", "inference", "quantization", "fine-tuning", "fine tuning",
+  "rag", "embeddings", "vector", "gpu", "tpu", "edge computing", "optimization",
+  // Prática / negócio
+  "enterprise", "startup", "implementation", "integration", "workflow", "automation",
+  "agent", "poc", "benchmark", "performance", "cost", "roi", "efficiency",
+  "tool", "platform", "framework", "library", "launch", "release", "available",
+  // Regulação
+  "regulation", "compliance", "ai act", "lgpd", "gdpr", "policy", "governance",
+  "anpd", "nist", "law", "legislation", "framework",
+  // Brasil
+  "inteligência artificial", "regulamentação", "conformidade", "implementação",
+  "ferramenta", "modelo", "agente", "automação",
+];
+
+function isRelevant(title: string, summary: string): boolean {
+  const text = `${title} ${summary}`.toLowerCase();
+  return PRACTICAL_AI_KEYWORDS.some((kw) => text.includes(kw));
+}
+
 export async function collectRssFeed(
   feed: RssFeedConfig,
   signal?: AbortSignal
@@ -20,13 +49,19 @@ export async function collectRssFeed(
 
   const feedData = await parser.parseURL(feed.url);
   const items: CollectedItem[] = [];
+  let skipped = 0;
 
-  const MAX_ITEMS = feed.maxItems ?? 6;
+  const MAX_ITEMS = feed.maxItems ?? 3;
 
-  for (const entry of (feedData.items ?? []).slice(0, MAX_ITEMS)) {
+  // Fontes curadas (The Batch, Import AI, NVIDIA etc.) já têm alta qualidade;
+  // fontes de notícias abertas passam pelo filtro de relevância
+  const shouldFilter = feed.relevanceFilter === true;
+
+  for (const entry of feedData.items ?? []) {
+    if (items.length >= MAX_ITEMS) break;
+
     const url = entry.link ?? entry.guid;
     const title = entry.title;
-
     if (!url || !title) continue;
 
     const summary = (
@@ -38,6 +73,11 @@ export async function collectRssFeed(
       .replace(/<[^>]+>/g, "")
       .trim()
       .slice(0, 500);
+
+    if (shouldFilter && !isRelevant(title, summary)) {
+      skipped++;
+      continue;
+    }
 
     const publishedAt = entry.isoDate ? new Date(entry.isoDate) : undefined;
 
@@ -58,7 +98,7 @@ export async function collectRssFeed(
       source: feed.source,
       status: "success",
       itemsCollected: items.length,
-      itemsSkipped: 0,
+      itemsSkipped: skipped,
     },
   };
 }

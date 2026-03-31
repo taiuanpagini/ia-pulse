@@ -2,104 +2,87 @@ export interface RssFeedConfig {
   url: string;
   source: string;
   topicSlug: string;
-  maxItems?: number; // default: 6
+  maxItems?: number;       // default: 3
   lang?: "pt" | "en";
+  /** Aplica filtro de palavras-chave de IA aplicada. Use em feeds de notícias
+   *  genéricas para eliminar artigos de opinião sem aplicabilidade real. */
+  relevanceFilter?: boolean;
 }
 
 export const RSS_FEEDS: RssFeedConfig[] = [
-  // Infraestrutura
+  // ── Infraestrutura ────────────────────────────────────────────────
   {
     url: "https://developer.nvidia.com/blog/feed",
     source: "NVIDIA Developer Blog",
     topicSlug: "infraestrutura",
+    maxItems: 3,
   },
   {
     url: "https://huggingface.co/blog/feed.xml",
     source: "Hugging Face Blog",
     topicSlug: "infraestrutura",
+    maxItems: 3,
   },
   {
-    url: "https://ai.googleblog.com/feeds/posts/default",
+    url: "https://blog.google/technology/ai/rss/",
     source: "Google AI Blog",
     topicSlug: "infraestrutura",
+    maxItems: 3,
   },
-  // Regulamentação
-  {
-    url: "https://eur-lex.europa.eu/RSSFUL.do?ihmlang=en&mtype=1&type=&sector=&domain=IA&DTS_DOM=AI",
-    source: "EUR-Lex AI Act",
-    topicSlug: "regulamentacao",
-  },
-  {
-    url: "https://www.gov.br/anpd/pt-br/assuntos/noticias/RSS",
-    source: "ANPD",
-    topicSlug: "regulamentacao",
-  },
-  {
-    url: "https://www.nist.gov/artificial-intelligence/rss.xml",
-    source: "NIST AI RMF",
-    topicSlug: "regulamentacao",
-  },
+
+  // ── Regulamentação ────────────────────────────────────────────────
   {
     url: "https://futureoflife.org/feed/",
     source: "Future of Life Institute",
     topicSlug: "regulamentacao",
+    maxItems: 2,
   },
-  {
-    url: "https://ainowinstitute.org/feed",
-    source: "AI Now Institute",
-    topicSlug: "regulamentacao",
-  },
-  {
-    url: "https://hai.stanford.edu/news/rss.xml",
-    source: "Stanford HAI",
-    topicSlug: "regulamentacao",
-  },
-  // Geral — Internacional
-  {
-    url: "https://www.deeplearning.ai/the-batch/feed/",
-    source: "The Batch",
-    topicSlug: "geral",
-    maxItems: 5,
-  },
+
+  // ── Geral — Newsletters / curadas (sem filtro: alta relação sinal/ruído) ──
   {
     url: "https://jack-clark.net/feed/",
     source: "Import AI",
     topicSlug: "geral",
-    maxItems: 4,
+    maxItems: 3,
   },
+
+  // ── Geral — Notícias aplicadas (filtro de relevância ativado) ──────
   {
     url: "https://venturebeat.com/category/ai/feed/",
     source: "VentureBeat AI",
     topicSlug: "geral",
-    maxItems: 6,
+    maxItems: 4,
+    relevanceFilter: true,
   },
   {
     url: "https://www.technologyreview.com/topic/artificial-intelligence/feed",
     source: "MIT Technology Review AI",
     topicSlug: "geral",
-    maxItems: 5,
+    maxItems: 3,
+    relevanceFilter: true,
+  },
+  {
+    url: "https://techcrunch.com/category/artificial-intelligence/feed/",
+    source: "TechCrunch AI",
+    topicSlug: "geral",
+    maxItems: 4,
+    relevanceFilter: true,
+  },
+  {
+    url: "https://the-decoder.com/feed/",
+    source: "The Decoder",
+    topicSlug: "geral",
+    maxItems: 3,
+    relevanceFilter: true,
   },
 
-  // Brasil — fontes em Português
+  // ── Brasil ─────────────────────────────────────────────────────────
   {
     url: "https://olhardigital.com.br/feed/",
     source: "Olhar Digital",
     topicSlug: "geral",
-    maxItems: 5,
+    maxItems: 2,
     lang: "pt",
-  },
-  {
-    url: "https://canaltech.com.br/rss.xml",
-    source: "Canaltech",
-    topicSlug: "geral",
-    maxItems: 5,
-    lang: "pt",
-  },
-  {
-    url: "https://www.gov.br/mcti/pt-br/acompanhe-o-mcti/noticias/RSS",
-    source: "MCTI Brasil",
-    topicSlug: "regulamentacao",
-    maxItems: 4,
-    lang: "pt",
+    relevanceFilter: true,
   },
 ];

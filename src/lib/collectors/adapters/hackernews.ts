@@ -4,12 +4,21 @@ const HN_API = "https://hn.algolia.com/api/v1/search";
 const SOURCE = "HackerNews";
 const TOPIC_SLUG = "geral";
 
-// Queries focadas em IA aplicada a negócio — não pesquisa pura
-const QUERIES = ["LLM production", "AI startup", "machine learning business"];
+// Queries focadas em IA aplicada — ferramentas, lançamentos, casos reais
+const QUERIES = [
+  "LLM production deployment",
+  "AI tool launch enterprise",
+  "machine learning open source release",
+];
 
-// Mínimo de pontos: garante que o post teve engajamento real da comunidade
-const MIN_POINTS = 50;
-const HITS_PER_QUERY = 10;
+// >= 300 pontos = post com engajamento real e validado pela comunidade HN
+const MIN_POINTS = 300;
+const HITS_PER_QUERY = 4;
+
+// Janela de 8 dias — cobre a semana + margem para horários de cron
+function sinceTimestamp(): number {
+  return Math.floor((Date.now() - 8 * 24 * 60 * 60 * 1000) / 1000);
+}
 
 interface HNHit {
   objectID: string;
@@ -20,6 +29,7 @@ interface HNHit {
   url?: string;
   story_url?: string;
   points?: number;
+  num_comments?: number;
   created_at?: string;
 }
 
@@ -34,7 +44,7 @@ export async function collectHackerNews(
       `${HN_API}?query=${encodeURIComponent(query)}` +
       `&tags=story` +
       `&hitsPerPage=${HITS_PER_QUERY}` +
-      `&numericFilters=points>=${MIN_POINTS}`;
+      `&numericFilters=points>=${MIN_POINTS},num_comments>=20,created_at_i>=${sinceTimestamp()}`;
 
     const response = await fetch(url, { signal });
     if (!response.ok) throw new Error(`HackerNews HTTP ${response.status}`);
@@ -52,7 +62,6 @@ export async function collectHackerNews(
       if (!title) continue;
 
       const summary = (hit.story_text ?? hit.comment_text ?? "").slice(0, 500);
-
       const publishedAt = hit.created_at ? new Date(hit.created_at) : undefined;
 
       items.push({
