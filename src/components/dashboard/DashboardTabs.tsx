@@ -42,7 +42,7 @@ export function DashboardTabs({ activeTab, counts }: DashboardTabsProps) {
   const tabs: Tab[] = [
     {
       id: "ranking",
-      label: "Ranking",
+      label: "Em Análise",
       icon: <LeaderboardOutlinedIcon sx={{ fontSize: 16 }} />,
       count: counts.ranking,
       activeColor: "#121212",

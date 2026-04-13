@@ -39,51 +39,19 @@ export const RSS_FEEDS: RssFeedConfig[] = [
     relevanceFilter: true,
   },
 
-  // ── Geral — Newsletters / curadas (sem filtro: alta relação sinal/ruído) ──
-  {
-    url: "https://jack-clark.net/feed/",
-    source: "Import AI",
-    topicSlug: "geral",
-    maxItems: 3,
-  },
-
-  // ── Geral — Notícias aplicadas (filtro de relevância ativado) ──────
+  // ── Infraestrutura — Notícias de mercado ─────────────────────────
   {
     url: "https://venturebeat.com/category/ai/feed/",
     source: "VentureBeat AI",
-    topicSlug: "geral",
-    maxItems: 4,
-    relevanceFilter: true,
-  },
-  {
-    url: "https://www.technologyreview.com/topic/artificial-intelligence/feed",
-    source: "MIT Technology Review AI",
-    topicSlug: "geral",
-    maxItems: 3,
-    relevanceFilter: true,
-  },
-  {
-    url: "https://techcrunch.com/category/artificial-intelligence/feed/",
-    source: "TechCrunch AI",
-    topicSlug: "geral",
+    topicSlug: "infraestrutura",
     maxItems: 4,
     relevanceFilter: true,
   },
   {
     url: "https://the-decoder.com/feed/",
     source: "The Decoder",
-    topicSlug: "geral",
+    topicSlug: "infraestrutura",
     maxItems: 3,
-    relevanceFilter: true,
-  },
-
-  // ── Brasil ─────────────────────────────────────────────────────────
-  {
-    url: "https://olhardigital.com.br/feed/",
-    source: "Olhar Digital",
-    topicSlug: "geral",
-    maxItems: 2,
-    lang: "pt",
     relevanceFilter: true,
   },
 ];

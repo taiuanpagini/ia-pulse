@@ -8,7 +8,6 @@ import {
   getUnscoredTrends,
   getTrendById,
   getRankingTrends,
-  getCarouselTrends,
   getTrendsByStatus,
   getTabCounts,
 } from "./repository";
@@ -200,32 +199,29 @@ export async function getRankingData(
   topicSlug?: string | null,
   search?: string | null,
   page = 1
-): Promise<{ carousel: ScoredTrendCard[]; trends: ScoredTrendCard[]; total: number }> {
+): Promise<{ trends: ScoredTrendCard[]; total: number }> {
   await connectDB();
-  const [carouselRaw, gridResult, topics] = await Promise.all([
-    getCarouselTrends(month, topicSlug, 10),
+  const [gridResult, topics] = await Promise.all([
     getRankingTrends(month, topicSlug, search, page),
     findAllTopics(),
   ]);
   const topicMap = new Map<string, ITopic>(topics.map((t) => [t.slug, t]));
-  const carousel = (carouselRaw as unknown as Array<ITrend & { _id: unknown }>)
-    .filter((t) => t.score != null)
-    .map((t) => toScoredCard(t, topicMap));
   const trends = (gridResult.items as unknown as Array<ITrend & { _id: unknown }>)
     .filter((t) => t.score != null)
     .map((t) => toScoredCard(t, topicMap));
-  return { carousel, trends, total: gridResult.total };
+  return { trends, total: gridResult.total };
 }
 
 export async function getStatusTabData(
   status: "approved" | "discarded",
   topicSlug?: string | null,
   search?: string | null,
-  page = 1
+  page = 1,
+  month?: string | null
 ): Promise<{ trends: (ScoredTrendCard | UnscoredTrendCard)[]; total: number }> {
   await connectDB();
   const [result, topics] = await Promise.all([
-    getTrendsByStatus(status, topicSlug, search, page),
+    getTrendsByStatus(status, topicSlug, search, page, 24, month),
     findAllTopics(),
   ]);
   const topicMap = new Map<string, ITopic>(topics.map((t) => [t.slug, t]));
@@ -238,11 +234,12 @@ export async function getStatusTabData(
 export async function getAwaitingData(
   topicSlug?: string | null,
   search?: string | null,
-  page = 1
+  page = 1,
+  month?: string | null
 ): Promise<{ trends: UnscoredTrendCard[]; total: number }> {
   await connectDB();
   const [result, topics] = await Promise.all([
-    getUnscoredTrends(topicSlug, search, page),
+    getUnscoredTrends(topicSlug, search, page, 24, month),
     findAllTopics(),
   ]);
   const topicMap = new Map<string, ITopic>(topics.map((t) => [t.slug, t]));

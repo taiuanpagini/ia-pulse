@@ -7,7 +7,7 @@ const QUERIES: { query: string; topicSlug: string; minCitations?: number }[] = [
   { query: "LLM fine-tuning production enterprise", topicSlug: "infraestrutura" },
   // Regulação tem menos papers citados em 12 meses — threshold menor
   { query: "AI regulation governance policy risk", topicSlug: "regulamentacao", minCitations: 5 },
-  { query: "AI business application ROI deployment", topicSlug: "geral" },
+  { query: "LLM deployment inference optimization enterprise", topicSlug: "infraestrutura" },
 ];
 
 const LIMIT_PER_QUERY = 8;

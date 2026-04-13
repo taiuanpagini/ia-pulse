@@ -120,12 +120,14 @@ export async function getTrendsByStatus(
   topicSlug?: string | null,
   search?: string | null,
   page = 1,
-  limit = 24
+  limit = 24,
+  month?: string | null
 ) {
   const skip = (page - 1) * limit;
   const filter: FilterQuery<ITrend> = {
     status,
     deletedAt: null,
+    ...monthFilter(month),
     ...(topicSlug ? { topicSlug } : {}),
     ...searchFilter(search),
   };
@@ -144,13 +146,15 @@ export async function getUnscoredTrends(
   topicSlug?: string | null,
   search?: string | null,
   page = 1,
-  limit = 24
+  limit = 24,
+  month?: string | null
 ) {
   const skip = (page - 1) * limit;
   const filter: FilterQuery<ITrend> = {
     score: { $exists: false },
     status: { $nin: ["approved", "discarded"] },
     deletedAt: null,
+    ...monthFilter(month),
     ...(topicSlug ? { topicSlug } : {}),
     ...searchFilter(search),
   };
@@ -176,9 +180,9 @@ export async function getTabCounts(
       ...monthFilter(month),
       ...topicFilter,
     }),
-    Trend.countDocuments({ status: "approved", deletedAt: null, ...topicFilter }),
-    Trend.countDocuments({ status: "discarded", deletedAt: null, ...topicFilter }),
-    Trend.countDocuments({ score: { $exists: false }, status: { $nin: ["approved", "discarded"] }, deletedAt: null, ...topicFilter }),
+    Trend.countDocuments({ status: "approved", deletedAt: null, ...monthFilter(month), ...topicFilter }),
+    Trend.countDocuments({ status: "discarded", deletedAt: null, ...monthFilter(month), ...topicFilter }),
+    Trend.countDocuments({ score: { $exists: false }, status: { $nin: ["approved", "discarded"] }, deletedAt: null, ...monthFilter(month), ...topicFilter }),
   ]);
   return { ranking, approved, discarded, awaiting };
 }

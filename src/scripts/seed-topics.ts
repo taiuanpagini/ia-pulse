@@ -23,12 +23,6 @@ const INITIAL_TOPICS = [
       "AI Act (EU), legislação brasileira (ANPD, PL 2338), NIST AI RMF e compliance",
     color: "amber" as const,
   },
-  {
-    name: "Geral",
-    slug: "geral",
-    description: "Notícias, pesquisas e tendências gerais em IA",
-    color: "emerald" as const,
-  },
 ];
 
 async function seed() {

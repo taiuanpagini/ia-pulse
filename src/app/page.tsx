@@ -22,7 +22,6 @@ import { DashboardEmptyState } from "@/components/dashboard/DashboardEmptyState"
 import { DashboardFilters } from "@/components/dashboard/DashboardFilters";
 import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
 import { PeriodSelector } from "@/components/dashboard/PeriodSelector";
-import { TopCarousel } from "@/components/dashboard/TopCarousel";
 import { StatusSection } from "@/components/dashboard/StatusSection";
 
 const PAGE_LIMIT = 24;
@@ -86,7 +85,6 @@ export default async function Home({
 
   const [topics, counts] = await Promise.all([listTopics(), fetchTabCounts(month, topic ?? null)]);
 
-  let rankingCarousel: Awaited<ReturnType<typeof getRankingData>>["carousel"] = [];
   let rankingTrends:   Awaited<ReturnType<typeof getRankingData>>["trends"]   = [];
   let rankingTotal = 0;
   let statusTrends: Awaited<ReturnType<typeof getStatusTabData>>["trends"] = [];
@@ -96,15 +94,14 @@ export default async function Home({
 
   if (tab === "ranking") {
     const data = await getRankingData(month, topic ?? null, q ?? null, page);
-    rankingCarousel = data.carousel;
     rankingTrends   = data.trends;
     rankingTotal    = data.total;
   } else if (tab === "approved" || tab === "discarded") {
-    const data = await getStatusTabData(tab, topic ?? null, q ?? null, page);
+    const data = await getStatusTabData(tab, topic ?? null, q ?? null, page, month);
     statusTrends = data.trends;
     statusTotal  = data.total;
   } else {
-    const data = await getAwaitingData(topic ?? null, q ?? null, page);
+    const data = await getAwaitingData(topic ?? null, q ?? null, page, month);
     awaitingTrends = data.trends;
     awaitingTotal  = data.total;
   }
@@ -194,28 +191,23 @@ export default async function Home({
             <DashboardTabs activeTab={tab} counts={counts} />
           </Suspense>
 
-          {tab === "ranking" && (
-            <Suspense fallback={null}>
-              <PeriodSelector activePeriod={month} />
-            </Suspense>
-          )}
+          <Suspense fallback={null}>
+            <PeriodSelector activePeriod={month} />
+          </Suspense>
 
           {tab === "ranking" && (
             rankingTotal === 0 ? (
-              <DashboardEmptyState message="Nenhuma tendência avaliada neste período." sub="Tente selecionar outro mês ou avalie tendências na aba Aguardando." />
+              <DashboardEmptyState message="Nenhuma tendência em análise neste período." sub="Tente selecionar outro mês ou avalie tendências na aba Aguardando." />
             ) : (
-              <Stack spacing={4}>
-                {rankingCarousel.length > 0 && <TopCarousel trends={rankingCarousel} />}
-                <RankedSection trends={rankingTrends} total={rankingTotal} page={page} limit={PAGE_LIMIT} />
-              </Stack>
+              <RankedSection trends={rankingTrends} total={rankingTotal} page={page} limit={PAGE_LIMIT} />
             )
           )}
 
           {(tab === "approved" || tab === "discarded") && (
             statusTotal === 0 ? (
               <DashboardEmptyState
-                message={tab === "approved" ? "Nenhuma tendência aprovada ainda." : "Nenhuma tendência descartada ainda."}
-                sub="Abra uma tendência avaliada e use os botões de status para classificar."
+                message={tab === "approved" ? "Nenhuma tendência aprovada neste período." : "Nenhuma tendência descartada neste período."}
+                sub="Tente selecionar outro mês ou classifique tendências nos detalhes."
               />
             ) : (
               <StatusSection trends={statusTrends} total={statusTotal} page={page} limit={PAGE_LIMIT} status={tab} />
@@ -223,7 +215,11 @@ export default async function Home({
           )}
 
           {tab === "awaiting" && (
-            <AwaitingSection trends={awaitingTrends} total={awaitingTotal} page={page} limit={PAGE_LIMIT} />
+            awaitingTotal === 0 ? (
+              <DashboardEmptyState message="Nenhuma tendência aguardando avaliação neste período." sub="Tente selecionar outro mês." />
+            ) : (
+              <AwaitingSection trends={awaitingTrends} total={awaitingTotal} page={page} limit={PAGE_LIMIT} />
+            )
           )}
         </Stack>
       </Container>

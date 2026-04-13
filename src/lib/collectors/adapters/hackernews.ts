@@ -2,13 +2,11 @@ import { CollectedItem, CollectorResult } from "../types";
 
 const HN_API = "https://hn.algolia.com/api/v1/search";
 const SOURCE = "HackerNews";
-const TOPIC_SLUG = "geral";
-
-// Queries focadas em IA aplicada — ferramentas, lançamentos, casos reais
-const QUERIES = [
-  "LLM production deployment",
-  "AI tool launch enterprise",
-  "machine learning open source release",
+// Queries focadas em infraestrutura de IA — modelos, ferramentas, lançamentos reais
+const QUERIES: { query: string; topicSlug: string }[] = [
+  { query: "LLM production deployment optimization", topicSlug: "infraestrutura" },
+  { query: "AI infrastructure GPU cloud enterprise", topicSlug: "infraestrutura" },
+  { query: "machine learning open source release", topicSlug: "infraestrutura" },
 ];
 
 // >= 300 pontos = post com engajamento real e validado pela comunidade HN
@@ -39,7 +37,7 @@ export async function collectHackerNews(
   const seen = new Set<string>();
   const items: CollectedItem[] = [];
 
-  for (const query of QUERIES) {
+  for (const { query, topicSlug } of QUERIES) {
     const url =
       `${HN_API}?query=${encodeURIComponent(query)}` +
       `&tags=story` +
@@ -69,7 +67,7 @@ export async function collectHackerNews(
         summary: summary || title,
         url: itemUrl,
         source: SOURCE,
-        topicSlug: TOPIC_SLUG,
+        topicSlug,
         collectedAt: new Date(),
         publishedAt,
       });
